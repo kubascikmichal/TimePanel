@@ -1,5 +1,8 @@
 #include "HTTP_Server.h"
 
+SemaphoreHandle_t HTTP_Server::sharedMut;
+State *HTTP_Server::st;
+
 HTTP_Server::HTTP_Server()
 {
     /* Generate default configuration */
@@ -22,6 +25,12 @@ HTTP_Server::HTTP_Server()
         httpd_register_uri_handler(server, &stopClock);
         httpd_register_uri_handler(server, &resetClock);
     }
+}
+
+void HTTP_Server::setup(State *st, SemaphoreHandle_t mut)
+{
+    this->st = st;
+    this->sharedMut = mut;
 }
 
 HTTP_Server::~HTTP_Server()
@@ -103,6 +112,14 @@ esp_err_t HTTP_Server::set_values(httpd_req_t *req)
     else
     {
         cJSON *values = cJSON_Parse(content);
+        if (xSemaphoreTake(sharedMut, 100) == pdPASS)
+        {
+            string str = cJSON_GetObjectItem(values, "university")->valuestring;
+            int time = atoi(cJSON_GetObjectItem(values, "time")->valuestring);
+            printf("%s, %d\n\r", str.c_str(), time);
+            st->setData(str, time);
+            xSemaphoreGive(sharedMut);
+        }
         cJSON_AddStringToObject(retjson, "status", "200");
     }
     httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
@@ -118,6 +135,11 @@ const httpd_uri_t HTTP_Server::setValues = {
 
 esp_err_t HTTP_Server::start_clock(httpd_req_t *req)
 {
+    if (xSemaphoreTake(sharedMut, 100) == pdPASS)
+    {
+        st->setState(START);
+        xSemaphoreGive(sharedMut);
+    }
     cJSON *retjson = cJSON_CreateObject();
     cJSON_AddStringToObject(retjson, "status", "200");
     httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
@@ -128,11 +150,15 @@ const httpd_uri_t HTTP_Server::startClock = {
     .method = HTTP_POST,
     .handler = HTTP_Server::start_clock,
     .user_ctx = NULL,
-}
-;
+};
 
 esp_err_t HTTP_Server::stop_clock(httpd_req_t *req)
 {
+    if (xSemaphoreTake(sharedMut, 100) == pdPASS)
+    {
+        st->setState(STOP);
+        xSemaphoreGive(sharedMut);
+    }
     cJSON *retjson = cJSON_CreateObject();
     cJSON_AddStringToObject(retjson, "status", "200");
     httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
@@ -147,6 +173,11 @@ const httpd_uri_t HTTP_Server::stopClock = {
 
 esp_err_t HTTP_Server::reset_clock(httpd_req_t *req)
 {
+    if (xSemaphoreTake(sharedMut, 100) == pdPASS)
+    {
+        st->setState(RESET);
+        xSemaphoreGive(sharedMut);
+    }
     cJSON *retjson = cJSON_CreateObject();
     cJSON_AddStringToObject(retjson, "status", "200");
     httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));

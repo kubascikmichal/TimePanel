@@ -10,6 +10,12 @@ Panel::~Panel()
 {
 }
 
+void Panel::setup(State *st, SemaphoreHandle_t mut)
+{
+    this->st = st;
+    this->mutex = mut;
+}
+
 uint16_t Panel::ledInPanel(uint16_t x, uint16_t y, bool odd)
 {
     if (!odd)
@@ -42,4 +48,48 @@ void Panel::init()
     matrix->setCursor(2, 30);
     matrix->print(F("00:00"));
     matrix->show();
+}
+
+void Panel::run()
+{
+    while (true)
+    {
+        if (xSemaphoreTake(mutex, 100) == pdPASS)
+        {
+            if (st->getState() != NONE)
+            {
+                switch (st->getState())
+                {
+                case START:
+                {
+                    printf("Clocks started\n\r");
+                };
+                break;
+                case STOP:
+                {
+                    printf("Clocks stoped\n\r");
+                };
+                break;
+                case RESET:
+                {
+                    printf("Clocks reset\n\r");
+                };
+                break;
+                case NEW_DATA:
+                {
+                    printf("data %s for %d\n\r", st->getString().c_str(), st->getData());
+                };
+                break;
+                default:
+                    break;
+                }
+                st->setState(NONE);
+                xSemaphoreGive(mutex);
+            }
+            else
+            {
+                xSemaphoreGive(mutex);
+            }
+        }
+    }
 }

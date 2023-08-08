@@ -7,15 +7,20 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#include "esp_system.h"
 #include "freertos/task.h"
+#include "../State/State.h"
 
 class HTTP_Server
 {
 private:
 public:
     static SemaphoreHandle_t sharedMut;
+    static State* st;
     HTTP_Server();
     ~HTTP_Server();
+
+    void setup(State* st, SemaphoreHandle_t mut);
 
     static esp_err_t get_root(httpd_req_t *req);
     static const httpd_uri_t getRoot;
