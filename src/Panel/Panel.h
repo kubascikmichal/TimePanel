@@ -28,16 +28,17 @@ private:
     string university;
     int time;
     bool started;
-    State *st;
+    State* st;
     SemaphoreHandle_t mutex;
-
+    
+    
     void init();
-    void changeTime();
+    void changeTime(); 
 
 public:
     Panel();
     ~Panel();
-    void setup(State *st, SemaphoreHandle_t mut);
+    void setup(State* st, SemaphoreHandle_t mut);
     void start();
     void stop();
     void reset();

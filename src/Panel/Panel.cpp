@@ -1,5 +1,5 @@
 #include "Panel.h"
-//TODO: Movement of university name
+
 Panel::Panel()
 {
     matrix = new Adafruit_NeoMatrix(64, 32, 15);
