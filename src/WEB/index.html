@@ -8,14 +8,15 @@
 
 <body style="background: #dbdbdb;">
     <div class="card">
-        <h3>Nastavenia panela</h3>
+        <h3>Nastavenia</h3>
         <form>
-            Nazov univerzity <input type="number" id="university">.<br>
+            Nazov univerzity <input id="university"><br>
             Pocet minut <input type="number" id="timeInterval" />
             </select>
-        </form>
-        <button class="button" onclick="setValues()">Set</button>
+        </form><br />
+        <button class="button" onclick="setValues()">Set</button><br />
         <button class="button" onclick="start()">Start</button>
         <button class="button" onclick="reset()">Reset</button>
+        <button class="button" onclick="stop()">Stop</button>
     </div>
 </body>

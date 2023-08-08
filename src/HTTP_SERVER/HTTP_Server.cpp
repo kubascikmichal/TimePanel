@@ -17,6 +17,10 @@ HTTP_Server::HTTP_Server()
         httpd_register_uri_handler(server, &getScript);
         httpd_register_uri_handler(server, &getStyle);
         httpd_register_uri_handler(server, &getFaviconIco);
+        httpd_register_uri_handler(server, &setValues);
+        httpd_register_uri_handler(server, &startClock);
+        httpd_register_uri_handler(server, &stopClock);
+        httpd_register_uri_handler(server, &resetClock);
     }
 }
 
@@ -82,5 +86,75 @@ const httpd_uri_t HTTP_Server::getFaviconIco = {
     .uri = "/favicon.ico",
     .method = HTTP_GET,
     .handler = HTTP_Server::get_favicon_ico,
+    .user_ctx = NULL,
+};
+
+esp_err_t HTTP_Server::set_values(httpd_req_t *req)
+{
+    char *content = (char *)malloc(req->content_len * sizeof(char));
+    memset(content, 0, req->content_len);
+    int ret = httpd_req_recv(req, content, req->content_len);
+    printf("Content: %s\n\r", content);
+    cJSON *retjson = cJSON_CreateObject();
+    if (ret <= 0)
+    {
+        cJSON_AddStringToObject(retjson, "status", "400");
+    }
+    else
+    {
+        cJSON *values = cJSON_Parse(content);
+        cJSON_AddStringToObject(retjson, "status", "200");
+    }
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    free(content);
+    return ESP_OK;
+}
+const httpd_uri_t HTTP_Server::setValues = {
+    .uri = "/setValues",
+    .method = HTTP_POST,
+    .handler = HTTP_Server::set_values,
+    .user_ctx = NULL,
+};
+
+esp_err_t HTTP_Server::start_clock(httpd_req_t *req)
+{
+    cJSON *retjson = cJSON_CreateObject();
+    cJSON_AddStringToObject(retjson, "status", "200");
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    return ESP_OK;
+}
+const httpd_uri_t HTTP_Server::startClock = {
+    .uri = "/startClocks",
+    .method = HTTP_POST,
+    .handler = HTTP_Server::start_clock,
+    .user_ctx = NULL,
+}
+;
+
+esp_err_t HTTP_Server::stop_clock(httpd_req_t *req)
+{
+    cJSON *retjson = cJSON_CreateObject();
+    cJSON_AddStringToObject(retjson, "status", "200");
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    return ESP_OK;
+}
+const httpd_uri_t HTTP_Server::stopClock = {
+    .uri = "/stopClocks",
+    .method = HTTP_POST,
+    .handler = HTTP_Server::stop_clock,
+    .user_ctx = NULL,
+};
+
+esp_err_t HTTP_Server::reset_clock(httpd_req_t *req)
+{
+    cJSON *retjson = cJSON_CreateObject();
+    cJSON_AddStringToObject(retjson, "status", "200");
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    return ESP_OK;
+}
+const httpd_uri_t HTTP_Server::resetClock = {
+    .uri = "/resetClocks",
+    .method = HTTP_POST,
+    .handler = HTTP_Server::reset_clock,
     .user_ctx = NULL,
 };

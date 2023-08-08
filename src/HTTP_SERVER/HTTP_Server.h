@@ -28,6 +28,18 @@ public:
 
     static esp_err_t get_favicon_ico(httpd_req_t *req);
     static const httpd_uri_t getFaviconIco;
+
+    static esp_err_t set_values(httpd_req_t *req);
+    static const httpd_uri_t setValues;
+
+    static esp_err_t start_clock(httpd_req_t *req);
+    static const httpd_uri_t startClock;
+
+    static esp_err_t stop_clock(httpd_req_t *req);
+    static const httpd_uri_t stopClock;
+
+    static esp_err_t reset_clock(httpd_req_t *req);
+    static const httpd_uri_t resetClock;
 };
 
 #endif
