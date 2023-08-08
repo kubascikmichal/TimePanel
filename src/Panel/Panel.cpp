@@ -4,6 +4,7 @@ Panel::Panel()
 {
     matrix = new Adafruit_NeoMatrix(64, 32, 15);
     init();
+    started = false;
 }
 
 Panel::~Panel()
@@ -40,14 +41,6 @@ void Panel::init()
     matrix->setTextWrap(false);
     matrix->setBrightness(20);
     matrix->setFont(&dotmat10pt7b_v2);
-    matrix->fillScreen(0);
-    matrix->setTextColor(matrix->Color(0, 0, 255));
-    matrix->setCursor(2, 14);
-    matrix->print(F("UNIZA"));
-    matrix->setTextColor(matrix->Color(0, 255, 0));
-    matrix->setCursor(2, 30);
-    matrix->print(F("00:00"));
-    matrix->show();
 }
 
 void Panel::run()
@@ -63,21 +56,32 @@ void Panel::run()
                 case START:
                 {
                     printf("Clocks started\n\r");
+                    started = true;
                 };
                 break;
                 case STOP:
                 {
+                    started = false;
                     printf("Clocks stoped\n\r");
                 };
                 break;
                 case RESET:
                 {
+                    started = false;
+                    actualTime.minutes = time;
+                    actualTime.seconds = 0;
+                    actualTime.decr = true;
                     printf("Clocks reset\n\r");
                 };
                 break;
                 case NEW_DATA:
                 {
                     printf("data %s for %d\n\r", st->getString().c_str(), st->getData());
+                    university = st->getString();
+                    time = st->getData();
+                    actualTime.decr = true;
+                    actualTime.minutes = time;
+                    actualTime.seconds = 0;
                 };
                 break;
                 default:
@@ -90,6 +94,65 @@ void Panel::run()
             {
                 xSemaphoreGive(mutex);
             }
+            if (started)
+            {
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                changeTime();
+                printf("%d:%d\n\r", actualTime.minutes, actualTime.seconds);
+            }
+            matrix->fillScreen(0);
+            matrix->setTextColor(matrix->Color(0, 0, 255));
+            matrix->setCursor(2, 14);
+            matrix->print(F(university.c_str()));
+            if (actualTime.decr)
+            {
+                matrix->setTextColor(matrix->Color(0, 255, 0));
+            }
+            else
+            {
+                matrix->setTextColor(matrix->Color(255, 0, 0));
+            }
+            matrix->setCursor(2, 30);
+            char time_str[5];
+            sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10, actualTime.seconds / 10, actualTime.seconds % 10);
+            matrix->print(F(time_str));
+            matrix->show();
+        }
+    }
+}
+
+void Panel::changeTime()
+{
+    if (this->actualTime.decr)
+    {
+        if (this->actualTime.seconds > 0)
+        {
+            this->actualTime.seconds--;
+        }
+        else
+        {
+            if (this->actualTime.minutes > 0)
+            {
+                this->actualTime.minutes--;
+                this->actualTime.seconds = 59;
+            }
+            else
+            {
+                this->actualTime.seconds++;
+                this->actualTime.decr = false;
+            }
+        }
+    }
+    else
+    {
+        if (this->actualTime.seconds <= 59)
+        {
+            this->actualTime.seconds++;
+        }
+        else
+        {
+            this->actualTime.minutes++;
+            this->actualTime.seconds = 0;
         }
     }
 }
