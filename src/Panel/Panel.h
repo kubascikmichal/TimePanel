@@ -17,6 +17,7 @@ typedef struct time
 {
     int minutes = 0;
     int seconds = 0;
+    bool decr = true;
 } TIME;
 
 class Panel
@@ -25,15 +26,18 @@ private:
     Adafruit_NeoMatrix *matrix;
     TIME actualTime;
     string university;
-    State* st;
+    int time;
+    bool started;
+    State *st;
     SemaphoreHandle_t mutex;
-    
+
     void init();
+    void changeTime();
 
 public:
     Panel();
     ~Panel();
-    void setup(State* st, SemaphoreHandle_t mut);
+    void setup(State *st, SemaphoreHandle_t mut);
     void start();
     void stop();
     void reset();
