@@ -5,7 +5,35 @@ Panel::Panel()
     matrix = new Adafruit_NeoMatrix(64, 32, 15);
     init();
     started = false;
-    university = string("PRESENTATION PANEL");
+    university = string("Stretnutie katedier 2023");
+    size = len(university.c_str(), university.length());
+    index = 32;
+    printf("%d\n\r", size);
+}
+
+int Panel::len(const char *str, int length)
+{
+    int size = 0;
+    for (int i = 0; i < length; i++)
+    {
+        if (str[i] >= 'a' && str[i] <= 'z')
+        {
+            size += LOWER_CASE;
+        }
+        else if (str[i] >= 'A' && str[i] <= 'Z')
+        {
+            size += UPPER_CASE;
+        }
+        else if (str[i] >= '0' && str[i] <= '9')
+        {
+            size += NUMBER;
+        }
+        else if (str[i] == ' ')
+        {
+            size += WHITESPACE;
+        }
+    }
+    return size;
 }
 
 Panel::~Panel()
@@ -79,13 +107,20 @@ void Panel::run()
                 case NEW_DATA:
                 {
                     university = st->getString();
+                    size = len(university.c_str(), university.length());
+                    printf("%d\n\r", size);
                     time = st->getData();
                     actualTime.decr = true;
                     actualTime.minutes = time;
                     actualTime.seconds = 0;
                     printf("data %s for %d\n\r", university.c_str(), actualTime.minutes);
                     lastStringChange = (uint32_t)esp_timer_get_time() / 1000;
-                    index = 0;
+                    index = 16;
+                    isChange = true;
+                    if (size < 64)
+                    {
+                        index = (int)((64 - size) / 2);
+                    }
                 };
                 break;
                 default:
@@ -112,15 +147,18 @@ void Panel::run()
             matrix->setTextColor(matrix->Color(0, 0, 255));
             if (((uint32_t)esp_timer_get_time() / 1000) - lastStringChange > DELAY_STRING)
             {
-                printf("%d\n\r", this->index);
-                if ((-1 * this->index) > (university.length() * 11))
+                if (size > 64)
                 {
-                    this->index = 64;
+                    printf("%d\n\r", this->index);
+                    if ((this->index) < (size * (-1)))
+                    {
+                        this->index = 64;
+                    }
+                    this->index--;
+                    isChange = true;
+                    lastStringChange = ((uint32_t)esp_timer_get_time() / 1000);
+                    printf("%d\n\r", this->index);
                 }
-                this->index--;
-                isChange = true;
-                lastStringChange = ((uint32_t)esp_timer_get_time() / 1000);
-                printf("%d\n\r", this->index);
             }
             matrix->setCursor(index, 14);
             matrix->print(F((university).c_str()));
@@ -132,7 +170,7 @@ void Panel::run()
             {
                 matrix->setTextColor(matrix->Color(255, 0, 0));
             }
-            matrix->setCursor(2, 30);
+            matrix->setCursor(4, 30);
             char time_str[5];
             sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10, actualTime.seconds / 10, actualTime.seconds % 10);
             matrix->print(F(time_str));

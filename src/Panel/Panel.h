@@ -12,7 +12,12 @@
 #define PANEL_COUNT PANEL_H *PANEL_W
 
 #define DELAY_TIME 1000 //in ms
-#define DELAY_STRING 30 // in ms -  change by 1px/30ms = 64px/2s
+#define DELAY_STRING 20 // in ms -  change by 1px/30ms = 64px/2s
+
+#define LOWER_CASE 8
+#define UPPER_CASE 12
+#define WHITESPACE 3
+#define NUMBER 10
 
 using namespace std;
 
@@ -29,6 +34,7 @@ private:
     Adafruit_NeoMatrix *matrix;
     TIME actualTime;
     string university;
+    int size;
     int time;
     bool started;
     State* st;
@@ -40,6 +46,7 @@ private:
     int index = 0;
     void init();
     void changeTime(); 
+    int len(const char* str, int length);
 
 public:
     Panel();
