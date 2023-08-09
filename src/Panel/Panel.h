@@ -11,6 +11,9 @@
 #define PANEL_H 16
 #define PANEL_COUNT PANEL_H *PANEL_W
 
+#define DELAY_TIME 1000 //in ms
+#define DELAY_STRING 30 // in ms -  change by 1px/30ms = 64px/2s
+
 using namespace std;
 
 typedef struct time
@@ -31,7 +34,10 @@ private:
     State* st;
     SemaphoreHandle_t mutex;
     
-    
+    uint32_t lastTimeChange;
+    uint32_t lastStringChange;
+    bool isChange = false;
+    int index = 0;
     void init();
     void changeTime(); 
 

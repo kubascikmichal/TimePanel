@@ -5,7 +5,7 @@ Panel::Panel()
     matrix = new Adafruit_NeoMatrix(64, 32, 15);
     init();
     started = false;
-    university = string("Presentation panel");
+    university = string("PRESENTATION PANEL");
 }
 
 Panel::~Panel()
@@ -58,6 +58,7 @@ void Panel::run()
                 {
                     printf("Clocks started\n\r");
                     started = true;
+                    lastTimeChange = (uint32_t)esp_timer_get_time() / 1000;
                 };
                 break;
                 case STOP:
@@ -77,12 +78,14 @@ void Panel::run()
                 break;
                 case NEW_DATA:
                 {
-                    printf("data %s for %d\n\r", st->getString().c_str(), st->getData());
                     university = st->getString();
                     time = st->getData();
                     actualTime.decr = true;
                     actualTime.minutes = time;
                     actualTime.seconds = 0;
+                    printf("data %s for %d\n\r", university.c_str(), actualTime.minutes);
+                    lastStringChange = (uint32_t)esp_timer_get_time() / 1000;
+                    index = 0;
                 };
                 break;
                 default:
@@ -97,14 +100,30 @@ void Panel::run()
             }
             if (started)
             {
-                vTaskDelay(1000 / portTICK_PERIOD_MS);
-                changeTime();
-                printf("%d:%d\n\r", actualTime.minutes, actualTime.seconds);
+                if (((uint32_t)esp_timer_get_time() / 1000) - lastTimeChange > DELAY_TIME)
+                {
+                    changeTime();
+                    printf("%d:%d\n\r", actualTime.minutes, actualTime.seconds);
+                    isChange = true;
+                    lastTimeChange = ((uint32_t)esp_timer_get_time() / 1000);
+                }
             }
             matrix->fillScreen(0);
             matrix->setTextColor(matrix->Color(0, 0, 255));
-            matrix->setCursor(2, 14);
-            matrix->print(F(university.c_str()));
+            if (((uint32_t)esp_timer_get_time() / 1000) - lastStringChange > DELAY_STRING)
+            {
+                printf("%d\n\r", this->index);
+                if ((-1 * this->index) > (university.length() * 11))
+                {
+                    this->index = 64;
+                }
+                this->index--;
+                isChange = true;
+                lastStringChange = ((uint32_t)esp_timer_get_time() / 1000);
+                printf("%d\n\r", this->index);
+            }
+            matrix->setCursor(index, 14);
+            matrix->print(F((university).c_str()));
             if (actualTime.decr)
             {
                 matrix->setTextColor(matrix->Color(0, 255, 0));
@@ -117,7 +136,11 @@ void Panel::run()
             char time_str[5];
             sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10, actualTime.seconds / 10, actualTime.seconds % 10);
             matrix->print(F(time_str));
-            matrix->show();
+            if (isChange)
+            {
+                matrix->show();
+                isChange = false;
+            }
         }
     }
 }
