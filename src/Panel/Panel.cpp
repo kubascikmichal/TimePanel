@@ -24,6 +24,10 @@ int Panel::len(const char *str, int length)
         {
             size += UPPER_CASE;
         }
+        else if (str[i] == '1')
+        {
+            size += ONE;
+        }
         else if (str[i] >= '0' && str[i] <= '9')
         {
             size += NUMBER;
@@ -32,8 +36,25 @@ int Panel::len(const char *str, int length)
         {
             size += WHITESPACE;
         }
+        else if (str[i] == ':')
+        {
+            size += COLON;
+        }
     }
     return size;
+}
+
+int Panel::timerOffset(const char *str, int length)
+{
+    int offset = 7;
+    for (int i = 0; i < length; i++)
+    {
+        if (str[i] == '1')
+        {
+            offset += NUMBER - ONE;
+        }
+    }
+    return offset;
 }
 
 Panel::~Panel()
@@ -108,6 +129,7 @@ void Panel::run()
                 {
                     university = st->getString();
                     size = len(university.c_str(), university.length());
+                    started = false;
                     printf("%d\n\r", size);
                     time = st->getData();
                     actualTime.decr = true;
@@ -170,9 +192,9 @@ void Panel::run()
             {
                 matrix->setTextColor(matrix->Color(255, 0, 0));
             }
-            matrix->setCursor(7, 30);
             char time_str[5];
             sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10, actualTime.seconds / 10, actualTime.seconds % 10);
+            matrix->setCursor(timerOffset(time_str,2), 30);
             matrix->print(F(time_str));
             if (isChange)
             {
