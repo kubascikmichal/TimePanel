@@ -170,7 +170,7 @@ void Panel::run()
             {
                 matrix->setTextColor(matrix->Color(255, 0, 0));
             }
-            matrix->setCursor(4, 30);
+            matrix->setCursor(7, 30);
             char time_str[5];
             sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10, actualTime.seconds / 10, actualTime.seconds % 10);
             matrix->print(F(time_str));
