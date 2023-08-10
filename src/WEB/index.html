@@ -6,20 +6,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body style="background: #dbdbdb;">
+<body style="background: #dbdbdb; font-family: fantasy;">
     <div class="card">
-        <h3>Nastavenia</h3>
+        <h1>Nastavenia</h1>
         <form>
-            Nazov univerzity <input id="university"><br>
-            Pocet minut <input type="number" id="timeInterval" />
+            <div style="margin: 1px;">
+                Nazov univerzity: <input id="university">
+            </div><br>
+            <div style="margin: 1px;">
+                Pocet minut: <input type="number" id="timeInterval" />
+            </div>
             </select>
         </form><br />
-        <button class="button" onclick="setValues()">Set</button><br />
-        <button class="button" onclick="start()">Start</button>
-        <button class="button" onclick="reset()">Reset</button>
-        <button class="button" onclick="stop()">Stop</button>
+        <button class="button" onclick="setValues()"
+            style="background-color: blue; color: antiquewhite;">Set</button><br />
+        <button class="button" onclick="start()" style="background-color: rgb(0, 255, 0);">Start</button>
+        <button class="button" onclick="reset()" style="background-color: orange;">Reset</button>
+        <button class="button" onclick="stop()" style="background-color: red;">Stop</button>
         <div class="slidecontainer">
-            <input oninput="sliderChange()" step="15" type="range" min="10" max="220" value="0" class="slider" id="myRange">
+            <input oninput="sliderChange()" step="15" type="range" min="10" max="220" value="0" class="slider"
+                id="myRange">
         </div>
     </div>
 </body>
