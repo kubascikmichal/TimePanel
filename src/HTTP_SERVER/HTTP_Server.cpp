@@ -23,6 +23,7 @@ HTTP_Server::HTTP_Server()
         httpd_register_uri_handler(server, &setValues);
         httpd_register_uri_handler(server, &startClock);
         httpd_register_uri_handler(server, &stopClock);
+        httpd_register_uri_handler(server, &setBrightness);
         httpd_register_uri_handler(server, &resetClock);
     }
 }
@@ -130,6 +131,40 @@ const httpd_uri_t HTTP_Server::setValues = {
     .uri = "/setValues",
     .method = HTTP_POST,
     .handler = HTTP_Server::set_values,
+    .user_ctx = NULL,
+};
+
+esp_err_t HTTP_Server::set_brightness(httpd_req_t *req)
+{
+    char *content = (char *)malloc(req->content_len * sizeof(char));
+    memset(content, 0, req->content_len);
+    int ret = httpd_req_recv(req, content, req->content_len);
+    printf("Content: %s\n\r", content);
+    cJSON *retjson = cJSON_CreateObject();
+    if (ret <= 0)
+    {
+        cJSON_AddStringToObject(retjson, "status", "400");
+    }
+    else
+    {
+        cJSON *values = cJSON_Parse(content);
+        if (xSemaphoreTake(sharedMut, 100) == pdPASS)
+        {
+            int brightness = atoi(cJSON_GetObjectItem(values, "brightness")->valuestring);
+            printf(" %d\n\r", brightness);
+            st->setBrightness(brightness);
+            xSemaphoreGive(sharedMut);
+        }
+        cJSON_AddStringToObject(retjson, "status", "200");
+    }
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    free(content);
+    return ESP_OK;
+}
+const httpd_uri_t HTTP_Server::setBrightness = {
+    .uri = "/setBrightness",
+    .method = HTTP_POST,
+    .handler = HTTP_Server::set_brightness,
     .user_ctx = NULL,
 };
 

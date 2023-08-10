@@ -89,7 +89,7 @@ void Panel::init()
     matrix->setRemapFunction(myRemapFn);
     matrix->begin();
     matrix->setTextWrap(false);
-    matrix->setBrightness(20);
+    matrix->setBrightness(10);
     matrix->setFont(&dotmat10pt7b_v2);
 }
 
@@ -145,6 +145,12 @@ void Panel::run()
                     }
                 };
                 break;
+                case NEW_BRIGHTNESS:
+                {
+                    matrix->setBrightness(st->getBrightness());
+                    isChange = true;
+                };
+                break;
                 default:
                     break;
                 }
@@ -194,7 +200,7 @@ void Panel::run()
             }
             char time_str[5];
             sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10, actualTime.seconds / 10, actualTime.seconds % 10);
-            matrix->setCursor(timerOffset(time_str,2), 30);
+            matrix->setCursor(timerOffset(time_str, 2), 30);
             matrix->print(F(time_str));
             if (isChange)
             {

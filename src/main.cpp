@@ -3,7 +3,7 @@
 #include "Panel/Panel.h"
 #include "State/State.h"
 
-const char *ssid = "ESP32";        // Enter SSID here
+const char *ssid = "Panel";        // Enter SSID here
 const char *password = "12345678"; // Enter Password here
 
 

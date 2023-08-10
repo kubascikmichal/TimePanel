@@ -16,11 +16,11 @@ class HTTP_Server
 private:
 public:
     static SemaphoreHandle_t sharedMut;
-    static State* st;
+    static State *st;
     HTTP_Server();
     ~HTTP_Server();
 
-    void setup(State* st, SemaphoreHandle_t mut);
+    void setup(State *st, SemaphoreHandle_t mut);
 
     static esp_err_t get_root(httpd_req_t *req);
     static const httpd_uri_t getRoot;
@@ -36,6 +36,9 @@ public:
 
     static esp_err_t set_values(httpd_req_t *req);
     static const httpd_uri_t setValues;
+
+    static esp_err_t set_brightness(httpd_req_t *req);
+    static const httpd_uri_t setBrightness;
 
     static esp_err_t start_clock(httpd_req_t *req);
     static const httpd_uri_t startClock;

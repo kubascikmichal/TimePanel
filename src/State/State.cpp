@@ -28,3 +28,14 @@ STATE State::getState()
 {
     return state;
 }
+
+void State::setBrightness(int brightness)
+{
+    this->setState(NEW_BRIGHTNESS);
+    this->brightness = brightness;
+}
+
+int State::getBrightness()
+{
+    return this->brightness;
+}

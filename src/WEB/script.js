@@ -54,3 +54,19 @@ function stop() {
         }
     }
 }
+
+function sliderChange() {
+        console.log(document.getElementById("myRange").value);
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "setBrightness", true);
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.send(JSON.stringify({
+            brightness: document.getElementById("myRange").value,
+        }));
+
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                console.log("set")
+            }
+        }
+}
