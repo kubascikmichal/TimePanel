@@ -34,6 +34,9 @@ public:
     static esp_err_t get_favicon_ico(httpd_req_t *req);
     static const httpd_uri_t getFaviconIco;
 
+    static esp_err_t get_status(httpd_req_t *req);
+    static const httpd_uri_t getStatus;
+
     static esp_err_t set_values(httpd_req_t *req);
     static const httpd_uri_t setValues;
 

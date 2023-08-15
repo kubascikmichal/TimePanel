@@ -1,6 +1,7 @@
 #include "State.h"
 State::State()
 {
+    this->time = 0;
 }
 State::~State()
 {

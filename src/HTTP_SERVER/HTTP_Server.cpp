@@ -7,6 +7,7 @@ HTTP_Server::HTTP_Server()
 {
     /* Generate default configuration */
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.max_uri_handlers = 10;
 
     /* Empty handle to esp_http_server */
     httpd_handle_t server = NULL;
@@ -23,6 +24,7 @@ HTTP_Server::HTTP_Server()
         httpd_register_uri_handler(server, &setValues);
         httpd_register_uri_handler(server, &startClock);
         httpd_register_uri_handler(server, &stopClock);
+        httpd_register_uri_handler(server, &getStatus);
         httpd_register_uri_handler(server, &setBrightness);
         httpd_register_uri_handler(server, &resetClock);
     }
@@ -165,6 +167,21 @@ const httpd_uri_t HTTP_Server::setBrightness = {
     .uri = "/setBrightness",
     .method = HTTP_POST,
     .handler = HTTP_Server::set_brightness,
+    .user_ctx = NULL,
+};
+
+esp_err_t HTTP_Server::get_status(httpd_req_t *req)
+{
+    cJSON *retjson = cJSON_CreateObject();
+    cJSON_AddStringToObject(retjson, "status", "200");
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    return ESP_OK;
+}
+
+const httpd_uri_t HTTP_Server::getStatus = {
+    .uri = "/getStatus",
+    .method = HTTP_GET,
+    .handler = HTTP_Server::get_status,
     .user_ctx = NULL,
 };
 

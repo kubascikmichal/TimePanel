@@ -1,3 +1,5 @@
+setInterval(getStatus, 5000);
+
 function setValues() {
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "setValues", true);
@@ -56,17 +58,38 @@ function stop() {
 }
 
 function sliderChange() {
-        console.log(document.getElementById("myRange").value);
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "setBrightness", true);
-        xhttp.setRequestHeader('Content-Type', 'application/json');
-        xhttp.send(JSON.stringify({
-            brightness: document.getElementById("myRange").value,
-        }));
+    console.log(document.getElementById("myRange").value);
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "setBrightness", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify({
+        brightness: document.getElementById("myRange").value,
+    }));
 
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                console.log("set")
-            }
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            console.log("set")
         }
+    }
+}
+
+
+function getStatus() {
+    document.getElementById("onlineStatus").style = "background-color: red;"
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "getStatus", true);
+    xhttp.send();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            if (this.responseText != "") {
+                var response = JSON.parse(this.responseText);
+                if (response.status == 200) {
+                    document.getElementById("onlineStatus").style = "background-color: green;"
+                } else {
+                    document.getElementById("onlineStatus").style = "background-color: red;"
+                }
+            }
+
+        }
+    }
 }

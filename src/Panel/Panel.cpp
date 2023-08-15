@@ -8,6 +8,7 @@ Panel::Panel()
     university = string("Stretnutie katedier 2023");
     size = len(university.c_str(), university.length());
     index = 32;
+    time=0;
     printf("%d\n\r", size);
 }
 
@@ -61,10 +62,11 @@ Panel::~Panel()
 {
 }
 
-void Panel::setup(State *st, SemaphoreHandle_t mut)
+void Panel::setup(State *st, SemaphoreHandle_t mut, TaskHandle_t handle)
 {
     this->st = st;
     this->mutex = mut;
+    this->handle = handle;
 }
 
 uint16_t Panel::ledInPanel(uint16_t x, uint16_t y, bool odd)
@@ -123,6 +125,7 @@ void Panel::run()
                     actualTime.seconds = 0;
                     actualTime.decr = true;
                     printf("Clocks reset\n\r");
+                    printf("%d:%d\n\r", actualTime.minutes, actualTime.seconds);
                 };
                 break;
                 case NEW_DATA:
@@ -130,12 +133,12 @@ void Panel::run()
                     university = st->getString();
                     size = len(university.c_str(), university.length());
                     started = false;
-                    printf("%d\n\r", size);
+                    // printf("%d\n\r", size);
                     time = st->getData();
                     actualTime.decr = true;
                     actualTime.minutes = time;
                     actualTime.seconds = 0;
-                    printf("data %s for %d\n\r", university.c_str(), actualTime.minutes);
+                    // printf("data %s for %d\n\r", university.c_str(), actualTime.minutes);
                     lastStringChange = (uint32_t)esp_timer_get_time() / 1000;
                     index = 16;
                     isChange = true;
@@ -166,6 +169,7 @@ void Panel::run()
                 if (((uint32_t)esp_timer_get_time() / 1000) - lastTimeChange > DELAY_TIME)
                 {
                     changeTime();
+                    //
                     printf("%d:%d\n\r", actualTime.minutes, actualTime.seconds);
                     isChange = true;
                     lastTimeChange = ((uint32_t)esp_timer_get_time() / 1000);
@@ -177,7 +181,7 @@ void Panel::run()
             {
                 if (size > 64)
                 {
-                    printf("%d\n\r", this->index);
+                    // printf("%d\n\r", this->index);
                     if ((this->index) < (size * (-1)))
                     {
                         this->index = 64;
@@ -185,7 +189,7 @@ void Panel::run()
                     this->index--;
                     isChange = true;
                     lastStringChange = ((uint32_t)esp_timer_get_time() / 1000);
-                    printf("%d\n\r", this->index);
+                    // printf("%d\n\r", this->index);
                 }
             }
             matrix->setCursor(index, 14);
@@ -228,6 +232,10 @@ void Panel::changeTime()
             }
             else
             {
+                if (this->actualTime.seconds == 0)
+                {
+                    xTaskNotify(this->handle, 1, eSetBits);
+                }
                 this->actualTime.seconds++;
                 this->actualTime.decr = false;
             }

@@ -41,6 +41,7 @@ private:
     bool started;
     State *st;
     SemaphoreHandle_t mutex;
+    TaskHandle_t handle;
 
     uint32_t lastTimeChange;
     uint32_t lastStringChange;
@@ -54,7 +55,7 @@ private:
 public:
     Panel();
     ~Panel();
-    void setup(State *st, SemaphoreHandle_t mut);
+    void setup(State *st, SemaphoreHandle_t mut, TaskHandle_t handle);
     void start();
     void stop();
     void reset();
