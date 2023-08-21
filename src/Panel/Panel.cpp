@@ -5,10 +5,10 @@ Panel::Panel()
     matrix = new Adafruit_NeoMatrix(64, 32, 15);
     init();
     started = false;
-    university = string("Stretnutie katedier 2023");
+    university = string("SKAKUII 23");
     size = len(university.c_str(), university.length());
     index = 32;
-    time=0;
+    time = 0;
     printf("%d\n\r", size);
 }
 
@@ -130,7 +130,10 @@ void Panel::run()
                 break;
                 case NEW_DATA:
                 {
-                    university = st->getString();
+                    if (st->getString().length() > 0)
+                    {
+                        university = st->getString();
+                    }
                     size = len(university.c_str(), university.length());
                     started = false;
                     // printf("%d\n\r", size);
@@ -222,6 +225,10 @@ void Panel::changeTime()
         if (this->actualTime.seconds > 0)
         {
             this->actualTime.seconds--;
+            if (this->actualTime.minutes == 0 && this->actualTime.seconds == 0)
+            {
+                xTaskNotify(this->handle, 1, eSetBits);
+            }
         }
         else
         {
@@ -232,10 +239,6 @@ void Panel::changeTime()
             }
             else
             {
-                if (this->actualTime.seconds == 0)
-                {
-                    xTaskNotify(this->handle, 1, eSetBits);
-                }
                 this->actualTime.seconds++;
                 this->actualTime.decr = false;
             }
