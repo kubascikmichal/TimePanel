@@ -1,0 +1,48 @@
+{
+    "program": [
+        {
+            "timeStart": {
+                "hours": 13,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 16,
+                "minutes": 0
+            },
+            "text":"Registrácia"
+        },
+        {
+            "timeStart": {
+                "hours": 16,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 16,
+                "minutes": 15
+            },
+            "text":"Otvorenie stretnutia"
+        },
+        {
+            "timeStart": {
+                "hours": 16,
+                "minutes": 15
+            },
+            "timeEnd": {
+                "hours": 19,
+                "minutes": 0
+            },
+            "text":"Predstavenie katedier (coffee break)"
+        },
+        {
+            "timeStart": {
+                "hours": 19,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 20,
+                "minutes": 0
+            },
+            "text":"Večera"
+        }
+    ]
+}

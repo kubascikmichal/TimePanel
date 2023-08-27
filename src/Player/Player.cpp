@@ -68,4 +68,5 @@ void Player::playCustom()
         // stop the waveform generation before the next note.
         noTone(this->pin);
     }
+    digitalWrite(this->pin, 0);
 }

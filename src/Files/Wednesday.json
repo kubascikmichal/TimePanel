@@ -1,0 +1,48 @@
+{
+    "program": [
+        {
+            "timeStart": {
+                "hours": 7,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 9,
+                "minutes": 0
+            },
+            "text":"Ranajky"
+        },
+        {
+            "timeStart": {
+                "hours": 9,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 10,
+                "minutes": 0
+            },
+            "text":"Prednáška (coffee break)"
+        },
+        {
+            "timeStart": {
+                "hours": 10,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 13,
+                "minutes": 0
+            },
+            "text":"Odborné prednášky"
+        },
+        {
+            "timeStart": {
+                "hours": 13,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 18,
+                "minutes": 0
+            },
+            "text":"Turistický výlet – Jánošíkové diery"
+        }
+    ]
+}
