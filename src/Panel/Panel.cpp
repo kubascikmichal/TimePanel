@@ -69,6 +69,12 @@ void Panel::setup(State *st, SemaphoreHandle_t mut, TaskHandle_t handle)
     this->handle = handle;
 }
 
+void Panel::setRTC(RTC *rtc, SemaphoreHandle_t mut)
+{
+    this->rtc = rtc;
+    this->rtcMutex = mut;
+}
+
 uint16_t Panel::ledInPanel(uint16_t x, uint16_t y, bool odd)
 {
     if (!odd)
@@ -101,118 +107,127 @@ void Panel::run()
     {
         if (xSemaphoreTake(mutex, 100) == pdPASS)
         {
-            if (st->getState() != NONE)
+            if (st->getMode())
             {
-                switch (st->getState())
+                if (st->getState() != NONE)
                 {
-                case START:
-                {
-                    printf("Clocks started\n\r");
-                    started = true;
-                    lastTimeChange = (uint32_t)esp_timer_get_time() / 1000;
-                };
-                break;
-                case STOP:
-                {
-                    started = false;
-                    printf("Clocks stoped\n\r");
-                };
-                break;
-                case RESET:
-                {
-                    started = false;
-                    actualTime.minutes = time;
-                    actualTime.seconds = 0;
-                    actualTime.decr = true;
-                    printf("Clocks reset\n\r");
-                    printf("%d:%d\n\r", actualTime.minutes, actualTime.seconds);
-                };
-                break;
-                case NEW_DATA:
-                {
-                    if (st->getString().length() > 0)
+                    switch (st->getState())
                     {
-                        university = st->getString();
-                    }
-                    size = len(university.c_str(), university.length());
-                    started = false;
-                    // printf("%d\n\r", size);
-                    time = st->getData();
-                    actualTime.decr = true;
-                    actualTime.minutes = time;
-                    actualTime.seconds = 0;
-                    // printf("data %s for %d\n\r", university.c_str(), actualTime.minutes);
-                    lastStringChange = (uint32_t)esp_timer_get_time() / 1000;
-                    index = 16;
-                    isChange = true;
-                    if (size < 64)
+                    case START:
                     {
-                        index = (int)((64 - size) / 2);
-                    }
-                };
-                break;
-                case NEW_BRIGHTNESS:
-                {
-                    matrix->setBrightness(st->getBrightness());
-                    isChange = true;
-                };
-                break;
-                default:
+                        printf("Clocks started\n\r");
+                        started = true;
+                        lastTimeChange = (uint32_t)esp_timer_get_time() / 1000;
+                    };
                     break;
-                }
-                st->setState(NONE);
-                xSemaphoreGive(mutex);
-            }
-            else
-            {
-                xSemaphoreGive(mutex);
-            }
-            if (started)
-            {
-                if (((uint32_t)esp_timer_get_time() / 1000) - lastTimeChange > DELAY_TIME)
-                {
-                    changeTime();
-                    //
-                    printf("%d:%d\n\r", actualTime.minutes, actualTime.seconds);
-                    isChange = true;
-                    lastTimeChange = ((uint32_t)esp_timer_get_time() / 1000);
-                }
-            }
-            matrix->fillScreen(0);
-            matrix->setTextColor(matrix->Color(0, 0, 255));
-            if (((uint32_t)esp_timer_get_time() / 1000) - lastStringChange > DELAY_STRING)
-            {
-                if (size > 64)
-                {
-                    // printf("%d\n\r", this->index);
-                    if ((this->index) < (size * (-1)))
+                    case STOP:
                     {
-                        this->index = 64;
+                        started = false;
+                        printf("Clocks stoped\n\r");
+                    };
+                    break;
+                    case RESET:
+                    {
+                        started = false;
+                        actualTime.minutes = time;
+                        actualTime.seconds = 0;
+                        actualTime.decr = true;
+                        printf("Clocks reset\n\r");
+                        printf("%d:%d\n\r", actualTime.minutes, actualTime.seconds);
+                    };
+                    break;
+                    case NEW_DATA:
+                    {
+                        if (st->getString().length() > 0)
+                        {
+                            university = st->getString();
+                        }
+                        size = len(university.c_str(), university.length());
+                        started = false;
+                        // printf("%d\n\r", size);
+                        time = st->getData();
+                        actualTime.decr = true;
+                        actualTime.minutes = time;
+                        actualTime.seconds = 0;
+                        // printf("data %s for %d\n\r", university.c_str(), actualTime.minutes);
+                        lastStringChange = (uint32_t)esp_timer_get_time() / 1000;
+                        index = 16;
+                        isChange = true;
+                        if (size < 64)
+                        {
+                            index = (int)((64 - size) / 2);
+                        }
+                    };
+                    break;
+                    case NEW_BRIGHTNESS:
+                    {
+                        matrix->setBrightness(st->getBrightness());
+                        isChange = true;
+                    };
+                    break;
+                    default:
+                        break;
                     }
-                    this->index--;
-                    isChange = true;
-                    lastStringChange = ((uint32_t)esp_timer_get_time() / 1000);
-                    // printf("%d\n\r", this->index);
+                    st->setState(NONE);
+                    xSemaphoreGive(mutex);
                 }
-            }
-            matrix->setCursor(index, 14);
-            matrix->print(F((university).c_str()));
-            if (actualTime.decr)
-            {
-                matrix->setTextColor(matrix->Color(0, 255, 0));
+                else
+                {
+                    xSemaphoreGive(mutex);
+                }
+                if (started)
+                {
+                    if (((uint32_t)esp_timer_get_time() / 1000) - lastTimeChange > DELAY_TIME)
+                    {
+                        changeTime();
+                        //
+                        printf("%d:%d\n\r", actualTime.minutes, actualTime.seconds);
+                        isChange = true;
+                        lastTimeChange = ((uint32_t)esp_timer_get_time() / 1000);
+                    }
+                }
+                matrix->fillScreen(0);
+                matrix->setTextColor(matrix->Color(0, 0, 255));
+                if (((uint32_t)esp_timer_get_time() / 1000) - lastStringChange > DELAY_STRING)
+                {
+                    if (size > 64)
+                    {
+                        // printf("%d\n\r", this->index);
+                        if ((this->index) < (size * (-1)))
+                        {
+                            this->index = 64;
+                        }
+                        this->index--;
+                        isChange = true;
+                        lastStringChange = ((uint32_t)esp_timer_get_time() / 1000);
+                        // printf("%d\n\r", this->index);
+                    }
+                }
+                matrix->setCursor(index, 14);
+                matrix->print(F((university).c_str()));
+                if (actualTime.decr)
+                {
+                    matrix->setTextColor(matrix->Color(0, 255, 0));
+                }
+                else
+                {
+                    matrix->setTextColor(matrix->Color(255, 0, 0));
+                }
+                char time_str[5];
+                sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10, actualTime.seconds / 10, actualTime.seconds % 10);
+                matrix->setCursor(timerOffset(time_str, 2), 30);
+                matrix->print(F(time_str));
+                if (isChange)
+                {
+                    matrix->show();
+                    isChange = false;
+                }
             }
             else
             {
-                matrix->setTextColor(matrix->Color(255, 0, 0));
-            }
-            char time_str[5];
-            sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10, actualTime.seconds / 10, actualTime.seconds % 10);
-            matrix->setCursor(timerOffset(time_str, 2), 30);
-            matrix->print(F(time_str));
-            if (isChange)
-            {
+                matrix->fillScreen(0);
                 matrix->show();
-                isChange = false;
+                xSemaphoreGive(mutex);
             }
         }
     }

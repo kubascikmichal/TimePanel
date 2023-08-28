@@ -6,6 +6,7 @@
 #include <Adafruit_NeoPixel.h>
 #include "../Fonts/dotmat10pt7b_v2.h"
 #include "../State/State.h"
+#include "../RTC/RTC.h"
 
 #define PANEL_W 16
 #define PANEL_H 16
@@ -43,6 +44,9 @@ private:
     SemaphoreHandle_t mutex;
     TaskHandle_t handle;
 
+    RTC *rtc;
+    SemaphoreHandle_t rtcMutex;
+
     uint32_t lastTimeChange;
     uint32_t lastStringChange;
     bool isChange = false;
@@ -56,6 +60,7 @@ public:
     Panel();
     ~Panel();
     void setup(State *st, SemaphoreHandle_t mut, TaskHandle_t handle);
+    void setRTC(RTC *rtc, SemaphoreHandle_t mut);
     void start();
     void stop();
     void reset();

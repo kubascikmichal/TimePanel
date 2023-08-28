@@ -20,7 +20,7 @@
                 "hours": 10,
                 "minutes": 0
             },
-            "text":"Prednáška (coffee break)"
+            "text":"Prednaska (coffee break)"
         },
         {
             "timeStart": {
@@ -31,7 +31,7 @@
                 "hours": 13,
                 "minutes": 0
             },
-            "text":"Odborné prednášky"
+            "text":"Odborne prednasky"
         },
         {
             "timeStart": {
@@ -42,7 +42,7 @@
                 "hours": 18,
                 "minutes": 0
             },
-            "text":"Turistický výlet – Jánošíkové diery"
+            "text":"Turisticky vylet – Janosikové diery"
         }
     ]
 }

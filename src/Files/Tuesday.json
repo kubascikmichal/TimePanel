@@ -9,7 +9,7 @@
                 "hours": 16,
                 "minutes": 0
             },
-            "text":"Registrácia"
+            "text":"Registracia"
         },
         {
             "timeStart": {
@@ -42,7 +42,7 @@
                 "hours": 20,
                 "minutes": 0
             },
-            "text":"Večera"
+            "text":"Vecera"
         }
     ]
 }

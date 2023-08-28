@@ -10,6 +10,7 @@
 #include "esp_system.h"
 #include "freertos/task.h"
 #include "../State/State.h"
+#include "../RTC/RTC.h"
 
 class HTTP_Server
 {
@@ -17,10 +18,13 @@ private:
 public:
     static SemaphoreHandle_t sharedMut;
     static State *st;
+    static RTC *_rtc;
+    static SemaphoreHandle_t _rtcMut;
     HTTP_Server();
     ~HTTP_Server();
 
     void setup(State *st, SemaphoreHandle_t mut);
+    void setRTC(RTC *rtc, SemaphoreHandle_t mut);
 
     static esp_err_t get_root(httpd_req_t *req);
     static const httpd_uri_t getRoot;
@@ -51,6 +55,15 @@ public:
 
     static esp_err_t reset_clock(httpd_req_t *req);
     static const httpd_uri_t resetClock;
+
+    static esp_err_t sync_RTC(httpd_req_t *req);
+    static const httpd_uri_t syncRTC;
+
+    static esp_err_t program_mode(httpd_req_t *req);
+    static const httpd_uri_t programMode;
+
+    static esp_err_t clocks_mode(httpd_req_t *req);
+    static const httpd_uri_t clocksMode;
 };
 
 #endif

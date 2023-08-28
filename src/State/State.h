@@ -20,14 +20,17 @@ private:
     int time;
     int brightness = 10;
     STATE state;
+    bool mode;
 public:
     State();
     ~State();
     void setState(STATE s);
     void setData(string str, int time);
     void setBrightness(int brightness);
+    void setMode(bool mode);
 
     string getString();
+    bool getMode();
     int getData();
     int getBrightness();
     STATE getState();

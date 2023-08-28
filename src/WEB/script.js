@@ -93,3 +93,52 @@ function getStatus() {
         }
     }
 }
+
+function sync() {
+    var xhttp = new XMLHttpRequest();
+    var date = new Date();
+    xhttp.open("POST", "syncRTC", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify({
+        day: date.getDate(),
+        hours: date.getHours(),
+        minutes: date.getMinutes(),
+        seconds:date.getSeconds(),
+        isConf: (date.getMonth() == 9 && date.getDate() >= 5 && date.getDate() <= 7)
+    }));
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            var response = JSON.parse(this.responseText);
+            console.log(response);
+            if (response.status == 200) {
+                console.log('Settings uploaded');
+            } else {
+                console.log('Settings are not uploaded');
+            }
+        }
+    }
+}
+
+function programMode() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "programMode", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            console.log("changeMode")
+        }
+    }
+}
+
+function clocksMode() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "clocksMode", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            console.log("changeMode")
+        }
+    }
+}

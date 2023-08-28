@@ -2,12 +2,14 @@
 
 SemaphoreHandle_t HTTP_Server::sharedMut;
 State *HTTP_Server::st;
+RTC *HTTP_Server::_rtc;
+SemaphoreHandle_t HTTP_Server::_rtcMut;
 
 HTTP_Server::HTTP_Server()
 {
     /* Generate default configuration */
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.max_uri_handlers = 10;
+    config.max_uri_handlers = 13;
 
     /* Empty handle to esp_http_server */
     httpd_handle_t server = NULL;
@@ -27,6 +29,9 @@ HTTP_Server::HTTP_Server()
         httpd_register_uri_handler(server, &getStatus);
         httpd_register_uri_handler(server, &setBrightness);
         httpd_register_uri_handler(server, &resetClock);
+        httpd_register_uri_handler(server, &syncRTC);
+        httpd_register_uri_handler(server, &programMode);
+        httpd_register_uri_handler(server, &clocksMode);
     }
 }
 
@@ -239,5 +244,88 @@ const httpd_uri_t HTTP_Server::resetClock = {
     .uri = "/resetClocks",
     .method = HTTP_POST,
     .handler = HTTP_Server::reset_clock,
+    .user_ctx = NULL,
+};
+
+esp_err_t HTTP_Server::sync_RTC(httpd_req_t *req)
+{
+    char *content = (char *)malloc(req->content_len * sizeof(char));
+    memset(content, 0, req->content_len);
+    int ret = httpd_req_recv(req, content, req->content_len);
+    printf("Content: %s\n\r", content);
+    cJSON *retjson = cJSON_CreateObject();
+    if (ret <= 0)
+    {
+        cJSON_AddStringToObject(retjson, "status", "400");
+    }
+    else
+    {
+        cJSON *values = cJSON_Parse(content);
+        if (xSemaphoreTake(_rtcMut, 100) == pdPASS)
+        {
+            RTC_TIME time;
+            time.day = (uint8_t)(cJSON_GetObjectItem(values, "day")->valueint);
+            time.hour = (uint8_t)(cJSON_GetObjectItem(values, "hours")->valueint);
+            time.minutes = (uint8_t)(cJSON_GetObjectItem(values, "minutes")->valueint);
+            time.seconds = (uint8_t)(cJSON_GetObjectItem(values, "seconds")->valueint);
+            _rtc->sync(time);
+            xSemaphoreGive(_rtcMut);
+        }
+        cJSON_AddStringToObject(retjson, "status", "200");
+    }
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    free(content);
+    return ESP_OK;
+}
+const httpd_uri_t HTTP_Server::syncRTC = {
+    .uri = "/syncRTC",
+    .method = HTTP_POST,
+    .handler = HTTP_Server::sync_RTC,
+    .user_ctx = NULL,
+};
+
+void HTTP_Server::setRTC(RTC *rtc, SemaphoreHandle_t mut)
+{
+    _rtc = rtc;
+    _rtcMut = mut;
+}
+
+esp_err_t HTTP_Server::program_mode(httpd_req_t *req)
+{
+    if (xSemaphoreTake(sharedMut, 100) == pdPASS)
+    {
+        st->setMode(false);
+        xSemaphoreGive(sharedMut);
+    }
+    cJSON *retjson = cJSON_CreateObject();
+    cJSON_AddStringToObject(retjson, "status", "200");
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    return ESP_OK;
+}
+
+const httpd_uri_t HTTP_Server::programMode = {
+    .uri = "/programMode",
+    .method = HTTP_POST,
+    .handler = HTTP_Server::program_mode,
+    .user_ctx = NULL,
+};
+
+esp_err_t HTTP_Server::clocks_mode(httpd_req_t *req)
+{
+    if (xSemaphoreTake(sharedMut, 100) == pdPASS)
+    {
+        st->setMode(true);
+        xSemaphoreGive(sharedMut);
+    }
+    cJSON *retjson = cJSON_CreateObject();
+    cJSON_AddStringToObject(retjson, "status", "200");
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    return ESP_OK;
+}
+
+const httpd_uri_t HTTP_Server::clocksMode = {
+    .uri = "/clocksMode",
+    .method = HTTP_POST,
+    .handler = HTTP_Server::clocks_mode,
     .user_ctx = NULL,
 };
