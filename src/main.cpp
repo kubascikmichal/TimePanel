@@ -63,7 +63,7 @@ void setup()
     Panel *p = new Panel();
     p->setup(s, mutex, timeout);
     p->setRTC(rtc, rtcMut);
-    xTaskCreatePinnedToCore(PanelTask, "RTC", 8192, p, 0, NULL, 0);
+    xTaskCreatePinnedToCore(PanelTask, "Panel", 8192, p, 2, NULL, 1);
 }
 
 void loop()
