@@ -38,6 +38,7 @@ void State::setBrightness(int brightness)
 
 int State::getBrightness()
 {
+    wasChange = true;
     return this->brightness;
 }
 

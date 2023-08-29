@@ -250,15 +250,20 @@ void Panel::run()
                 if (st->getChange())
                 {
                     matrix->setFont(&font);
+                    matrix->setTextColor(matrix->Color(0, 0, 255));
                 }
                 if (xSemaphoreTake(rtcMutex, 100) == pdPASS)
                 {
+                    if (st->getState() == NEW_BRIGHTNESS)
+                    {
+                        matrix->setBrightness(st->getBrightness());
+                    }
                     if (rtc->getChange() || st->getChange())
                     {
                         matrix->fillScreen(0);
                         char time_str[10];
                         sprintf(time_str, "%d%d:%d%d", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
-                        string prg[3]; 
+                        string prg[3];
                         program->getUpcommingEvents(rtc->getActualTime(), prg);
                         matrix->setCursor(timerOffset(time_str, 2, 1), 8);
                         matrix->print(F(time_str));
