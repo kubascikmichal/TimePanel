@@ -227,13 +227,15 @@ void Panel::run()
             {
                 if (xSemaphoreTake(rtcMutex, 100) == pdPASS)
                 {
-                    //TODO: new state machine
-                    matrix->fillScreen(0);
-                    char time_str[5];
-                    sprintf(time_str, "%d%d:%d%d", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
-                    matrix->setCursor(timerOffset(time_str, 2), 22);
-                    matrix->print(F(time_str));
-                    matrix->show();
+                    if (rtc->getChange())
+                    {
+                        matrix->fillScreen(0);
+                        char time_str[5];
+                        sprintf(time_str, "%d%d:%d%d", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
+                        matrix->setCursor(timerOffset(time_str, 2), 22);
+                        matrix->print(F(time_str));
+                        matrix->show();
+                    }
                     xSemaphoreGive(rtcMutex);
                 }
                 xSemaphoreGive(mutex);

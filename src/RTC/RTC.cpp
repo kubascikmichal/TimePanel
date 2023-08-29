@@ -19,9 +19,11 @@ void RTC::sync(RTC_TIME time)
 
 void RTC::incrementTime()
 {
+    changedTime = true;
     if (this->time.seconds < 59)
     {
         this->time.seconds++;
+        changedTime = false;
     }
     else if (this->time.minutes < 59)
     {
@@ -40,4 +42,14 @@ void RTC::incrementTime()
         this->time.hour = 0;
         this->time.minutes = 0;
     }
+}
+
+bool RTC::getChange()
+{
+    return changedTime;
+}
+
+void RTC::removeChange()
+{
+    changedTime = false;
 }

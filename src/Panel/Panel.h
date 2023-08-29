@@ -55,6 +55,8 @@ private:
     void changeTime();
     int len(const char *str, int length);
     int timerOffset(const char *str, int length);
+    void clockStateMachine();
+    void programStateMachine();
 
 public:
     Panel();

@@ -14,12 +14,15 @@ class RTC
 {
 private:
     RTC_TIME time;
+    bool changedTime = false;
 public:
     RTC();
     ~RTC();
     RTC_TIME getActualTime();
     void sync(RTC_TIME time);
     void incrementTime();
+    bool getChange();
+    void removeChange();
 };
 
 #endif
