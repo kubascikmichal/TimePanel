@@ -21,6 +21,7 @@ private:
     int brightness = 10;
     STATE state;
     bool mode;
+    bool wasChange;
 public:
     State();
     ~State();
@@ -31,6 +32,8 @@ public:
 
     string getString();
     bool getMode();
+    bool getChange();
+    void resetChange();
     int getData();
     int getBrightness();
     STATE getState();

@@ -10,6 +10,7 @@ Panel::Panel()
     index = 32;
     time = 0;
     printf("%d\n\r", size);
+    program = new Program();
 }
 
 int Panel::len(const char *str, int length)
@@ -45,14 +46,29 @@ int Panel::len(const char *str, int length)
     return size;
 }
 
-int Panel::timerOffset(const char *str, int length)
+int Panel::timerOffset(const char *str, int length, int font)
 {
-    int offset = 7;
-    for (int i = 0; i < length; i++)
+    int offset = 0;
+    if (font == 0)
     {
-        if (str[i] == '1')
+        offset = 7;
+        for (int i = 0; i < length; i++)
         {
-            offset += NUMBER - ONE;
+            if (str[i] == '1')
+            {
+                offset += NUMBER - ONE;
+            }
+        }
+    }
+    else
+    {
+        offset = 18;
+        for (int i = 0; i < length; i++)
+        {
+            if (str[i] == '1')
+            {
+                offset += 6 - 5;
+            }
         }
     }
     return offset;
@@ -109,6 +125,11 @@ void Panel::run()
         {
             if (st->getMode())
             {
+                if (st->getChange())
+                {
+                    matrix->setFont(&dotmat10pt7b_v2);
+                    st->resetChange();
+                }
                 if (st->getState() != NONE)
                 {
                     switch (st->getState())
@@ -225,19 +246,34 @@ void Panel::run()
             }
             else
             {
+
+                if (st->getChange())
+                {
+                    matrix->setFont(&font);
+                }
                 if (xSemaphoreTake(rtcMutex, 100) == pdPASS)
                 {
-                    if (rtc->getChange())
+                    if (rtc->getChange() || st->getChange())
                     {
                         matrix->fillScreen(0);
-                        char time_str[5];
+                        char time_str[10];
                         sprintf(time_str, "%d%d:%d%d", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
-                        matrix->setCursor(timerOffset(time_str, 2), 22);
+                        string prg[3]; 
+                        program->getUpcommingEvents(rtc->getActualTime(), prg);
+                        matrix->setCursor(timerOffset(time_str, 2, 1), 8);
                         matrix->print(F(time_str));
+                        matrix->setCursor(0, 16);
+                        matrix->print(F(prg[0].c_str()));
+                        matrix->setCursor(0, 24);
+                        matrix->print(F(prg[1].c_str()));
+                        matrix->setCursor(0, 32);
+                        matrix->print(F(prg[2].c_str()));
                         matrix->show();
+                        rtc->removeChange();
                     }
                     xSemaphoreGive(rtcMutex);
                 }
+                st->resetChange();
                 xSemaphoreGive(mutex);
             }
         }

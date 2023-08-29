@@ -41,10 +41,22 @@ int State::getBrightness()
     return this->brightness;
 }
 
-void State::setMode(bool mode){
+void State::setMode(bool mode)
+{
     this->mode = mode;
+    wasChange = true;
 }
 
-bool State::getMode(){
+bool State::getMode()
+{
     return this->mode;
+}
+
+void State::resetChange()
+{
+    wasChange = false;
+}
+
+bool State::getChange(){
+    return wasChange;
 }

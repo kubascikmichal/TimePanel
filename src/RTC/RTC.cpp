@@ -2,6 +2,7 @@
 
 RTC::RTC()
 {
+    changedTime = true;
 }
 
 RTC::~RTC()
@@ -15,32 +16,35 @@ RTC_TIME RTC::getActualTime()
 void RTC::sync(RTC_TIME time)
 {
     this->time = time;
+    changedTime = true;
 }
 
 void RTC::incrementTime()
 {
-    changedTime = true;
+
     if (this->time.seconds < 59)
     {
         this->time.seconds++;
-        changedTime = false;
     }
     else if (this->time.minutes < 59)
     {
         this->time.minutes++;
         this->time.seconds = 0;
+        changedTime = true;
     }
     else if (this->time.hour < 23)
     {
         this->time.hour++;
         this->time.minutes = 0;
         this->time.seconds = 0;
+        changedTime = true;
     }
     else
     {
         this->time.day++;
         this->time.hour = 0;
         this->time.minutes = 0;
+        changedTime = true;
     }
 }
 

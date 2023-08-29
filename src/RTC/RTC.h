@@ -14,7 +14,7 @@ class RTC
 {
 private:
     RTC_TIME time;
-    bool changedTime = false;
+    bool changedTime;
 public:
     RTC();
     ~RTC();

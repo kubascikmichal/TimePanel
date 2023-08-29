@@ -9,7 +9,7 @@
                 "hours": 16,
                 "minutes": 0
             },
-            "text":"Registracia"
+            "text":"REGISTRACIA"
         },
         {
             "timeStart": {
@@ -20,7 +20,7 @@
                 "hours": 16,
                 "minutes": 15
             },
-            "text":"Otvorenie stretnutia"
+            "text":"OTVORENIE STRETNUTIA"
         },
         {
             "timeStart": {
@@ -31,7 +31,7 @@
                 "hours": 19,
                 "minutes": 0
             },
-            "text":"Predstavenie katedier (coffee break)"
+            "text":"PREDSTAVENIE KATEDIER (COFFE BREAK)"
         },
         {
             "timeStart": {
@@ -42,7 +42,18 @@
                 "hours": 20,
                 "minutes": 0
             },
-            "text":"Vecera"
+            "text":"VECERA"
+        },
+        {
+            "timeStart": {
+                "hours": 20,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 24,
+                "minutes": 0
+            },
+            "text":"POSEDENIE PRI ZIVEJ HUDBE"
         }
     ]
 }

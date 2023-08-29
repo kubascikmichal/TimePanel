@@ -9,7 +9,7 @@
                 "hours": 9,
                 "minutes": 0
             },
-            "text":"Ranajky"
+            "text": "RANAJKY"
         },
         {
             "timeStart": {
@@ -20,7 +20,7 @@
                 "hours": 10,
                 "minutes": 0
             },
-            "text":"Prednaska (coffee break)"
+            "text": "PREDNASKA (COFFE BREAK)"
         },
         {
             "timeStart": {
@@ -31,7 +31,7 @@
                 "hours": 13,
                 "minutes": 0
             },
-            "text":"Odborne prednasky"
+            "text": "ODBORNE PREDNASKY"
         },
         {
             "timeStart": {
@@ -42,7 +42,28 @@
                 "hours": 18,
                 "minutes": 0
             },
-            "text":"Turisticky vylet – Janosikové diery"
+            "text": "TURISTICKY VYLET - JANOSIKOVE DIERY"
+        },
+        {
+            "timeStart": {
+                "hours": 18,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 19,
+                "minutes": 0
+            },
+            "text": "OKRUHLY STOL"
+        },{
+            "timeStart": {
+                "hours": 19,
+                "minutes": 0
+            },
+            "timeEnd": {
+                "hours": 24,
+                "minutes": 0
+            },
+            "text": "POSEDENIE PRI OHNI"
         }
     ]
 }

@@ -5,8 +5,10 @@
 #include <Adafruit_NeoMatrix.h>
 #include <Adafruit_NeoPixel.h>
 #include "../Fonts/dotmat10pt7b_v2.h"
+#include "../Fonts/font.h"
 #include "../State/State.h"
 #include "../RTC/RTC.h"
+#include "../Program/Program.h"
 
 #define PANEL_W 16
 #define PANEL_H 16
@@ -41,6 +43,7 @@ private:
     int time;
     bool started;
     State *st;
+    Program* program;
     SemaphoreHandle_t mutex;
     TaskHandle_t handle;
 
@@ -54,7 +57,7 @@ private:
     void init();
     void changeTime();
     int len(const char *str, int length);
-    int timerOffset(const char *str, int length);
+    int timerOffset(const char *str, int length, int font = 0);
     void clockStateMachine();
     void programStateMachine();
 
