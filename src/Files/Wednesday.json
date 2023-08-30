@@ -1,4 +1,5 @@
 {
+    "day":6,
     "program": [
         {
             "timeStart": {
@@ -20,7 +21,7 @@
                 "hours": 10,
                 "minutes": 0
             },
-            "text": "PREDNASKA (COFFE BREAK)"
+            "text": "PREDNASKA ( COFFE BREAK )"
         },
         {
             "timeStart": {
@@ -63,7 +64,7 @@
                 "hours": 24,
                 "minutes": 0
             },
-            "text": "POSEDENIE PRI OHNI"
+            "text": "POSEDENIE PRI OHNI, VECERA"
         }
     ]
 }

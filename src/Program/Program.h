@@ -15,6 +15,7 @@ private:
     cJSON *thursday;
     void loadProgram();
     int isInInterval(RTC_TIME time, RTC_TIME start, RTC_TIME end);
+    int process(cJSON *day, string *events, int counter, RTC_TIME time);
 
 public:
     Program();

@@ -14,8 +14,9 @@
 #define PANEL_H 16
 #define PANEL_COUNT PANEL_H *PANEL_W
 
-#define DELAY_TIME 1000 // in ms
-#define DELAY_STRING 20 // in ms -  change by 1px/30ms = 64px/2s
+#define DELAY_TIME 1000   // in ms
+#define DELAY_STRING 20   // in ms -  change by 1px/30ms = 64px/2s
+#define DELAY_PROGRAM 150 // in ms
 
 #define LOWER_CASE 8
 #define UPPER_CASE 12
@@ -43,7 +44,7 @@ private:
     int time;
     bool started;
     State *st;
-    Program* program;
+    Program *program;
     SemaphoreHandle_t mutex;
     TaskHandle_t handle;
 
@@ -52,6 +53,9 @@ private:
 
     uint32_t lastTimeChange;
     uint32_t lastStringChange;
+    uint32_t lastProgramChange;
+    string lastProgram[3];
+    int iteration = 0;
     bool isChange = false;
     int index = 0;
     void init();
@@ -60,6 +64,7 @@ private:
     int timerOffset(const char *str, int length, int font = 0);
     void clockStateMachine();
     void programStateMachine();
+    void placeProgram(string program, int column, int iteration);
 
 public:
     Panel();

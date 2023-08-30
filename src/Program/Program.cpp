@@ -49,74 +49,47 @@ int Program::isInInterval(RTC_TIME time, RTC_TIME start, RTC_TIME end)
 void Program::getUpcommingEvents(RTC_TIME time, string *events)
 {
     int countOfEvents = 0;
-    cJSON *program = cJSON_GetObjectItem(this->tuesday, "program");
+    for (int i = 0; i < 3; i++)
+    {
+        events[i] = string("");
+    }
+    
+    countOfEvents = process(this->tuesday, events, countOfEvents, time);
+    if (countOfEvents != 3)
+    {
+        countOfEvents = process(this->wednesday, events, countOfEvents, time);
+    }
+    if (countOfEvents != 3)
+    {
+        countOfEvents = process(this->thursday, events, countOfEvents, time);
+    }
+    return;
+}
+
+int Program::process(cJSON *day, string *events, int counter, RTC_TIME time)
+{
+    cJSON *program = cJSON_GetObjectItem(day, "program");
     cJSON *event;
     cJSON_ArrayForEach(event, program)
     {
         RTC_TIME start;
-        start.day = 5;
+        start.day = cJSON_GetObjectItem(day, "day")->valueint;
         start.hour = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeStart"), "hours")->valueint;
         start.minutes = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeStart"), "minutes")->valueint;
         RTC_TIME end;
-        end.day = 5;
+        end.day = cJSON_GetObjectItem(day, "day")->valueint;
         end.hour = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeEnd"), "hours")->valueint;
         end.minutes = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeEnd"), "minutes")->valueint;
         if (isInInterval(time, start, end))
         {
-            char time_str[50];
-            sprintf(time_str, "%d%d:%d%d %s", start.hour / 10, start.hour % 10, start.minutes / 10, start.minutes % 10, cJSON_GetObjectItem(event, "text")->valuestring);
-            events[countOfEvents++] = string(time_str) + string(" ") + cJSON_GetObjectItem(event, "text")->valuestring;
+            char time_str[100];
+            sprintf(time_str, "%d%d:%d%d              %s", start.hour / 10, start.hour % 10, start.minutes / 10, start.minutes % 10, cJSON_GetObjectItem(event, "text")->valuestring);
+            events[counter++] = string(time_str);
         }
-        if (countOfEvents == 3)
+        if (counter == 3)
         {
-            return;
+            return counter;
         }
     }
-
-    program = cJSON_GetObjectItem(this->wednesday, "program");
-    event;
-    cJSON_ArrayForEach(event, program)
-    {
-        RTC_TIME start;
-        start.day = 6;
-        start.hour = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeStart"), "hours")->valueint;
-        start.minutes = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeStart"), "minutes")->valueint;
-        RTC_TIME end;
-        end.day = 6;
-        end.hour = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeEnd"), "hours")->valueint;
-        end.minutes = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeEnd"), "minutes")->valueint;
-        if (isInInterval(time, start, end))
-        {
-            char time_str[50];
-            sprintf(time_str, "%d%d:%d%d %s", start.hour / 10, start.hour % 10, start.minutes / 10, start.minutes % 10, cJSON_GetObjectItem(event, "text")->valuestring);
-            events[countOfEvents++] = string(time_str);
-        }
-        if (countOfEvents == 3)
-        {
-            return;
-        }
-    }
-    program = cJSON_GetObjectItem(this->thursday, "program");
-    event;
-    cJSON_ArrayForEach(event, program)
-    {
-        RTC_TIME start;
-        start.day = 7;
-        start.hour = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeStart"), "hours")->valueint;
-        start.minutes = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeStart"), "minutes")->valueint;
-        RTC_TIME end;
-        end.day = 7;
-        end.hour = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeEnd"), "hours")->valueint;
-        end.minutes = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeEnd"), "minutes")->valueint;
-        if (isInInterval(time, start, end))
-        {
-            char time_str[50];
-            sprintf(time_str, "%d%d:%d%d %s", start.hour / 10, start.hour % 10, start.minutes / 10, start.minutes % 10, cJSON_GetObjectItem(event, "text")->valuestring);
-            events[countOfEvents++] = string(time_str) + string(" ") + cJSON_GetObjectItem(event, "text")->valuestring;
-        }
-        if (countOfEvents == 3)
-        {
-            return;
-        }
-    }
+    return counter;
 }

@@ -1,4 +1,5 @@
 {
+    "day":5,
     "program": [
         {
             "timeStart": {
@@ -31,7 +32,7 @@
                 "hours": 19,
                 "minutes": 0
             },
-            "text":"PREDSTAVENIE KATEDIER (COFFE BREAK)"
+            "text":"PREDSTAVENIE KATEDIER ( COFFE BREAK )"
         },
         {
             "timeStart": {
