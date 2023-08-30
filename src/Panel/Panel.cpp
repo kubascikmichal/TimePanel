@@ -62,12 +62,20 @@ int Panel::timerOffset(const char *str, int length, int font)
     }
     else
     {
-        offset = 23;
+        offset = 31;
         for (int i = 0; i < length; i++)
         {
             if (str[i] == '1')
             {
                 offset += 5 - 4;
+            }
+            if (str[i] >= 'A' && str[i] <= 'Z')
+            {
+                offset -= 6;
+            }
+            if (str[i] == ' ')
+            {
+                offset -= 4;
             }
         }
     }
@@ -275,10 +283,26 @@ void Panel::run()
                     if ((((uint32_t)esp_timer_get_time() / 1000) - lastProgramChange) > DELAY_PROGRAM)
                     {
                         this->iteration++;
-                        lastProgramChange =((uint32_t)esp_timer_get_time() / 1000);
-                        char time_str[10];
-                        sprintf(time_str, "%d%d:%d%d", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
-                        matrix->setCursor(timerOffset(time_str, 2, 1), 8);
+                        lastProgramChange = ((uint32_t)esp_timer_get_time() / 1000);
+                        char time_str[20];
+                        switch (rtc->getActualTime().day)
+                        {
+                        case 5:
+                            sprintf(time_str, "%s %d%d:%d%d", "UTO", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
+                            break;
+                        case 6:
+                            sprintf(time_str, "%s %d%d:%d%d", "STR", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
+                            break;
+                        case 7:
+                            sprintf(time_str, "%s %d%d:%d%d", "STV", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
+                            break;
+                        default:
+                            break;
+                        }
+                        // printf("%s\n\r", time_str);
+
+                        matrix->setTextColor(matrix->Color(0, 0, 255));
+                        matrix->setCursor(timerOffset(time_str, 9, 1), 8);
                         matrix->fillScreen(0);
                         matrix->print(F(time_str));
                         placeProgram(this->lastProgram[0], 1, this->iteration);
@@ -342,11 +366,21 @@ void Panel::placeProgram(string program, int column, int iteration)
         int indexY = (column + 1) * 8;
         int indexX = 6 + iteration % (program.length() - 6);
         matrix->setCursor(0, indexY);
-        matrix->setTextColor(matrix->Color(0, 255, 0));
-        matrix->print(F(program.substr(0, 5).c_str()));
+        if (program.c_str()[0] == 'A')
+        {
+            matrix->setTextColor(matrix->Color(255, 255, 0));
+        }
+        else
+        {
+            matrix->setTextColor(matrix->Color(0, 255, 0));
+        }
+        matrix->print(F(program.substr(1, 5).c_str()));
         matrix->setCursor(22, indexY);
         matrix->setTextColor(matrix->Color(0, 0, 255));
+        if (program.c_str()[0] == 'A'){
+            matrix->setTextColor(matrix->Color(255, 0, 0));
+        }
         matrix->print(F(program.substr(indexX, program.length() - indexX).c_str()));
-        //printf("%s\n\r", program.c_str());
+        // printf("%s\n\r", program.c_str());
     }
 }

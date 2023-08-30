@@ -32,11 +32,17 @@ void Program::loadProgram()
 
 int Program::isInInterval(RTC_TIME time, RTC_TIME start, RTC_TIME end)
 {
-    if ((time.day > end.day) || ((time.day == end.day) && (time.hour > end.hour)) || ((time.day == end.day) && (time.hour == end.hour) && (time.minutes > end.minutes)) || ((time.day == end.day) && (time.hour == end.hour) && (time.minutes == end.minutes) && (time.seconds > end.seconds)))
+    if ((time.day > end.day) ||
+        ((time.day == end.day) && (time.hour > end.hour)) ||
+        ((time.day == end.day) && (time.hour == end.hour) && (time.minutes > end.minutes)) ||
+        ((time.day == end.day) && (time.hour == end.hour) && (time.minutes == end.minutes) && (time.seconds > end.seconds)))
     {
         return 0;
     }
-    else if ((time.day < start.day) || ((time.day == start.day) && (time.hour < start.hour)) || ((time.day == start.day) && (time.hour == start.hour) && (time.minutes < start.minutes)) || ((time.day == start.day) && (time.hour == start.hour) && (time.minutes == start.minutes) && (time.seconds < start.seconds)))
+    else if ((time.day < start.day) ||
+             ((time.day == start.day) && (time.hour < start.hour)) ||
+             ((time.day == start.day) && (time.hour == start.hour) && (time.minutes < start.minutes)) || 
+             ((time.day == start.day) && (time.hour == start.hour) && (time.minutes == start.minutes) && (time.seconds < start.seconds)))
     {
         return 2;
     }
@@ -53,7 +59,7 @@ void Program::getUpcommingEvents(RTC_TIME time, string *events)
     {
         events[i] = string("");
     }
-    
+
     countOfEvents = process(this->tuesday, events, countOfEvents, time);
     if (countOfEvents != 3)
     {
@@ -80,10 +86,12 @@ int Program::process(cJSON *day, string *events, int counter, RTC_TIME time)
         end.day = cJSON_GetObjectItem(day, "day")->valueint;
         end.hour = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeEnd"), "hours")->valueint;
         end.minutes = cJSON_GetObjectItem(cJSON_GetObjectItem(event, "timeEnd"), "minutes")->valueint;
-        if (isInInterval(time, start, end))
+        int ret = isInInterval(time, start, end);
+        if (ret)
         {
+            char c = (ret == 2) ? 'U' : 'A';
             char time_str[100];
-            sprintf(time_str, "%d%d:%d%d              %s", start.hour / 10, start.hour % 10, start.minutes / 10, start.minutes % 10, cJSON_GetObjectItem(event, "text")->valuestring);
+            sprintf(time_str, "%c%d%d:%d%d              %s",c, start.hour / 10, start.hour % 10, start.minutes / 10, start.minutes % 10, cJSON_GetObjectItem(event, "text")->valuestring);
             events[counter++] = string(time_str);
         }
         if (counter == 3)

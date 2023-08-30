@@ -16,7 +16,7 @@
 
 #define DELAY_TIME 1000   // in ms
 #define DELAY_STRING 20   // in ms -  change by 1px/30ms = 64px/2s
-#define DELAY_PROGRAM 150 // in ms
+#define DELAY_PROGRAM 200 // in ms
 
 #define LOWER_CASE 8
 #define UPPER_CASE 12
