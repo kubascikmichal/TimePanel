@@ -60,7 +60,7 @@ int Panel::timerOffset(const char *str, int length, int font)
             }
         }
     }
-    else
+    else if (font == 1)
     {
         offset = 31;
         for (int i = 0; i < length; i++)
@@ -73,9 +73,19 @@ int Panel::timerOffset(const char *str, int length, int font)
             {
                 offset -= 6;
             }
-            if (str[i] == ' ')
+            if (str[i] == ' ' || str[i] == '-')
             {
                 offset -= 4;
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < length; i++)
+        {
+            if (str[i] == '1')
+            {
+                offset += 1;
             }
         }
     }
@@ -275,8 +285,14 @@ void Panel::run()
                         if ((prg[0].length() != this->lastProgram[0].length()) ||
                             (memcmp(prg[0].c_str(), this->lastProgram[0].c_str(), min(prg[0].length(), this->lastProgram[0].length()))))
                         {
+                            if ((prg[0].length() != this->lastProgram[0].length()) ||
+                                (memcmp(prg[0].substr(1, prg[0].length()).c_str(),
+                                        this->lastProgram[0].substr(1, this->lastProgram[0].length()).c_str(),
+                                        min(prg[0].length(), this->lastProgram[0].length()) - 1)))
+                            {
+                                this->iteration = 0;
+                            }
                             program->getUpcommingEvents(rtc->getActualTime(), this->lastProgram);
-                            this->iteration = 0;
                         }
                         rtc->removeChange();
                     }
@@ -297,6 +313,7 @@ void Panel::run()
                             sprintf(time_str, "%s %d%d:%d%d", "STV", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
                             break;
                         default:
+                            sprintf(time_str, "%s %d%d:%d%d", "---", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
                             break;
                         }
                         // printf("%s\n\r", time_str);
@@ -364,8 +381,20 @@ void Panel::placeProgram(string program, int column, int iteration)
     if (program.length() > 6)
     {
         int indexY = (column + 1) * 8;
-        int indexX = 6 + iteration % (program.length() - 6);
-        matrix->setCursor(0, indexY);
+        int offset = 22 - (iteration % (((program.length() - 11) * 5) + 11 * 4));
+        matrix->setCursor(offset, indexY);
+        matrix->setTextColor(matrix->Color(0, 0, 255));
+        if (program.c_str()[0] == 'A')
+        {
+            matrix->setTextColor(matrix->Color(255, 0, 0));
+        }
+        matrix->print(F(program.substr(6, program.length()).c_str()));
+        for (int i = 0; i < 8; i++)
+        {
+            matrix->drawLine(0, (indexY - 8) + i, 22, (indexY - 8) + i, matrix->Color(0, 0, 0));
+        }
+
+        matrix->setCursor(timerOffset(program.substr(1, 5).c_str(), 5, 2), indexY);
         if (program.c_str()[0] == 'A')
         {
             matrix->setTextColor(matrix->Color(255, 255, 0));
@@ -375,12 +404,5 @@ void Panel::placeProgram(string program, int column, int iteration)
             matrix->setTextColor(matrix->Color(0, 255, 0));
         }
         matrix->print(F(program.substr(1, 5).c_str()));
-        matrix->setCursor(22, indexY);
-        matrix->setTextColor(matrix->Color(0, 0, 255));
-        if (program.c_str()[0] == 'A'){
-            matrix->setTextColor(matrix->Color(255, 0, 0));
-        }
-        matrix->print(F(program.substr(indexX, program.length() - indexX).c_str()));
-        // printf("%s\n\r", program.c_str());
     }
 }

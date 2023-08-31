@@ -4,20 +4,19 @@ SemaphoreHandle_t HTTP_Server::sharedMut;
 State *HTTP_Server::st;
 RTC *HTTP_Server::_rtc;
 SemaphoreHandle_t HTTP_Server::_rtcMut;
-
+/**
+ * @brief Construct a new http server::http server object
+ *
+ */
 HTTP_Server::HTTP_Server()
 {
-    /* Generate default configuration */
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.max_uri_handlers = 13;
 
-    /* Empty handle to esp_http_server */
     httpd_handle_t server = NULL;
 
-    /* Start the httpd server */
     if (httpd_start(&server, &config) == ESP_OK)
     {
-        /* Register URI handlers */
         Serial.println("Registring uris");
         httpd_register_uri_handler(server, &getRoot);
         httpd_register_uri_handler(server, &getScript);
@@ -35,16 +34,32 @@ HTTP_Server::HTTP_Server()
     }
 }
 
+/**
+ * @brief setup method for initialization of shared data
+ *
+ * @param st pointer to State
+ * @param mut pointer to mutex
+ */
 void HTTP_Server::setup(State *st, SemaphoreHandle_t mut)
 {
     this->st = st;
     this->sharedMut = mut;
 }
 
+/**
+ * @brief Destroy the http server::http server object
+ *
+ */
 HTTP_Server::~HTTP_Server()
 {
 }
 
+/**
+ * @brief handler for script.js
+ *
+ * @param req
+ * @return esp_err_t
+ */
 esp_err_t HTTP_Server::get_script(httpd_req_t *req)
 {
     extern const unsigned char script_html_start[] asm("_binary_src_WEB_script_js_start");
@@ -53,12 +68,23 @@ esp_err_t HTTP_Server::get_script(httpd_req_t *req)
     httpd_resp_send(req, (const char *)script_html_start, script_html_size);
     return ESP_OK;
 }
+/**
+ * @brief struct for getScript handler
+ * 
+ */
 const httpd_uri_t HTTP_Server::getScript = {
     .uri = "/script.js",
     .method = HTTP_GET,
     .handler = HTTP_Server::get_script,
     .user_ctx = NULL,
 };
+
+/**
+ * @brief  handler for style.css
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::get_style(httpd_req_t *req)
 {
     extern const unsigned char style_html_start[] asm("_binary_src_WEB_style_css_start");
@@ -68,6 +94,11 @@ esp_err_t HTTP_Server::get_style(httpd_req_t *req)
     httpd_resp_send(req, (const char *)style_html_start, style_html_size);
     return ESP_OK;
 }
+
+/**
+ * @brief struct for getStyle handler
+ * 
+ */
 const httpd_uri_t HTTP_Server::getStyle = {
     .uri = "/style.css",
     .method = HTTP_GET,
@@ -75,6 +106,12 @@ const httpd_uri_t HTTP_Server::getStyle = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for return index.html
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::get_root(httpd_req_t *req)
 {
     extern const unsigned char settings_html_start[] asm("_binary_src_WEB_index_html_start");
@@ -83,6 +120,11 @@ esp_err_t HTTP_Server::get_root(httpd_req_t *req)
     httpd_resp_send(req, (const char *)settings_html_start, settings_html_size);
     return ESP_OK;
 }
+
+/**
+ * @brief struct for getRoot handler
+ * 
+ */
 const httpd_uri_t HTTP_Server::getRoot = {
     .uri = "/",
     .method = HTTP_GET,
@@ -90,6 +132,12 @@ const httpd_uri_t HTTP_Server::getRoot = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for return favicon.ico
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::get_favicon_ico(httpd_req_t *req)
 {
     extern const unsigned char favicon_ico_start[] asm("_binary_src_WEB_favicon_ico_start");
@@ -99,6 +147,11 @@ esp_err_t HTTP_Server::get_favicon_ico(httpd_req_t *req)
     httpd_resp_send(req, (const char *)favicon_ico_start, favicon_ico_size);
     return ESP_OK;
 }
+
+/**
+ * @brief struct for handler getFaviconIco
+ * 
+ */
 const httpd_uri_t HTTP_Server::getFaviconIco = {
     .uri = "/favicon.ico",
     .method = HTTP_GET,
@@ -106,6 +159,12 @@ const httpd_uri_t HTTP_Server::getFaviconIco = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for setting values as university, time
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::set_values(httpd_req_t *req)
 {
     char *content = (char *)malloc(req->content_len * sizeof(char));
@@ -134,6 +193,11 @@ esp_err_t HTTP_Server::set_values(httpd_req_t *req)
     free(content);
     return ESP_OK;
 }
+
+/**
+ * @brief struct for handler setValues
+ * 
+ */
 const httpd_uri_t HTTP_Server::setValues = {
     .uri = "/setValues",
     .method = HTTP_POST,
@@ -141,6 +205,12 @@ const httpd_uri_t HTTP_Server::setValues = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for set brightness
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::set_brightness(httpd_req_t *req)
 {
     char *content = (char *)malloc(req->content_len * sizeof(char));
@@ -168,6 +238,11 @@ esp_err_t HTTP_Server::set_brightness(httpd_req_t *req)
     free(content);
     return ESP_OK;
 }
+
+/**
+ * @brief handler for setBrightness
+ * 
+ */
 const httpd_uri_t HTTP_Server::setBrightness = {
     .uri = "/setBrightness",
     .method = HTTP_POST,
@@ -175,6 +250,12 @@ const httpd_uri_t HTTP_Server::setBrightness = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for get online/offline status
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::get_status(httpd_req_t *req)
 {
     cJSON *retjson = cJSON_CreateObject();
@@ -183,6 +264,10 @@ esp_err_t HTTP_Server::get_status(httpd_req_t *req)
     return ESP_OK;
 }
 
+/**
+ * @brief struct for handler getStatus
+ * 
+ */
 const httpd_uri_t HTTP_Server::getStatus = {
     .uri = "/getStatus",
     .method = HTTP_GET,
@@ -190,6 +275,12 @@ const httpd_uri_t HTTP_Server::getStatus = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for starting clocks
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::start_clock(httpd_req_t *req)
 {
     if (xSemaphoreTake(sharedMut, 100) == pdPASS)
@@ -202,6 +293,11 @@ esp_err_t HTTP_Server::start_clock(httpd_req_t *req)
     httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
     return ESP_OK;
 }
+
+/**
+ * @brief struct for handler startClock
+ * 
+ */
 const httpd_uri_t HTTP_Server::startClock = {
     .uri = "/startClocks",
     .method = HTTP_POST,
@@ -209,6 +305,12 @@ const httpd_uri_t HTTP_Server::startClock = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for stopping clocks
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::stop_clock(httpd_req_t *req)
 {
     if (xSemaphoreTake(sharedMut, 100) == pdPASS)
@@ -221,6 +323,11 @@ esp_err_t HTTP_Server::stop_clock(httpd_req_t *req)
     httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
     return ESP_OK;
 }
+
+/**
+ * @brief struct for handler stopClock
+ * 
+ */
 const httpd_uri_t HTTP_Server::stopClock = {
     .uri = "/stopClocks",
     .method = HTTP_POST,
@@ -228,6 +335,12 @@ const httpd_uri_t HTTP_Server::stopClock = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for reseting clocks
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::reset_clock(httpd_req_t *req)
 {
     if (xSemaphoreTake(sharedMut, 100) == pdPASS)
@@ -240,6 +353,11 @@ esp_err_t HTTP_Server::reset_clock(httpd_req_t *req)
     httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
     return ESP_OK;
 }
+
+/**
+ * @brief struct for handler resetClock
+ * 
+ */
 const httpd_uri_t HTTP_Server::resetClock = {
     .uri = "/resetClocks",
     .method = HTTP_POST,
@@ -247,6 +365,12 @@ const httpd_uri_t HTTP_Server::resetClock = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for synchronization of RTC
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::sync_RTC(httpd_req_t *req)
 {
     char *content = (char *)malloc(req->content_len * sizeof(char));
@@ -277,6 +401,11 @@ esp_err_t HTTP_Server::sync_RTC(httpd_req_t *req)
     free(content);
     return ESP_OK;
 }
+
+/**
+ * @brief struct for handler syncRTC
+ * 
+ */
 const httpd_uri_t HTTP_Server::syncRTC = {
     .uri = "/syncRTC",
     .method = HTTP_POST,
@@ -290,6 +419,12 @@ void HTTP_Server::setRTC(RTC *rtc, SemaphoreHandle_t mut)
     _rtcMut = mut;
 }
 
+/**
+ * @brief handler for changing mode to program mode
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::program_mode(httpd_req_t *req)
 {
     if (xSemaphoreTake(sharedMut, 100) == pdPASS)
@@ -303,6 +438,10 @@ esp_err_t HTTP_Server::program_mode(httpd_req_t *req)
     return ESP_OK;
 }
 
+/**
+ * @brief struct for handler programMode
+ * 
+ */
 const httpd_uri_t HTTP_Server::programMode = {
     .uri = "/programMode",
     .method = HTTP_POST,
@@ -310,6 +449,12 @@ const httpd_uri_t HTTP_Server::programMode = {
     .user_ctx = NULL,
 };
 
+/**
+ * @brief handler for changing mode to clock mode
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t HTTP_Server::clocks_mode(httpd_req_t *req)
 {
     if (xSemaphoreTake(sharedMut, 100) == pdPASS)
@@ -323,6 +468,10 @@ esp_err_t HTTP_Server::clocks_mode(httpd_req_t *req)
     return ESP_OK;
 }
 
+/**
+ * @brief struct for clocksMode
+ * 
+ */
 const httpd_uri_t HTTP_Server::clocksMode = {
     .uri = "/clocksMode",
     .method = HTTP_POST,

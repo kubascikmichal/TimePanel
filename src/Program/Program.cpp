@@ -91,7 +91,7 @@ int Program::process(cJSON *day, string *events, int counter, RTC_TIME time)
         {
             char c = (ret == 2) ? 'U' : 'A';
             char time_str[100];
-            sprintf(time_str, "%c%d%d:%d%d              %s",c, start.hour / 10, start.hour % 10, start.minutes / 10, start.minutes % 10, cJSON_GetObjectItem(event, "text")->valuestring);
+            sprintf(time_str, "%c%d%d:%d%d           %s",c, start.hour / 10, start.hour % 10, start.minutes / 10, start.minutes % 10, cJSON_GetObjectItem(event, "text")->valuestring);
             events[counter++] = string(time_str);
         }
         if (counter == 3)
