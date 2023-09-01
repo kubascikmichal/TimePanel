@@ -85,7 +85,7 @@ int Panel::timerOffset(const char *str, int length, int font)
         {
             if (str[i] == '1')
             {
-                offset += 1;
+                offset += (i<=2)?1:0;
             }
         }
     }
