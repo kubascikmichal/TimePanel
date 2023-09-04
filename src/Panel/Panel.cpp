@@ -85,7 +85,7 @@ int Panel::timerOffset(const char *str, int length, int font)
         {
             if (str[i] == '1')
             {
-                offset += (i<=2)?1:0;
+                offset += (i <= 2) ? 1 : 0;
             }
         }
     }
@@ -204,6 +204,11 @@ void Panel::run()
                         isChange = true;
                     };
                     break;
+                    case BUZZER_ON:
+                    {
+                        xTaskNotify(this->handle, 1, eSetBits);
+                    };
+                    break;
                     default:
                         break;
                     }
@@ -271,12 +276,13 @@ void Panel::run()
                     this->lastProgramChange = ((uint32_t)esp_timer_get_time() / 1000);
                     program->getUpcommingEvents(rtc->getActualTime(), this->lastProgram);
                 }
+                if (st->getState() == NEW_BRIGHTNESS)
+                {
+                    matrix->setBrightness(st->getBrightness());
+                }
                 if (xSemaphoreTake(rtcMutex, 100) == pdPASS)
                 {
-                    if (st->getState() == NEW_BRIGHTNESS)
-                    {
-                        matrix->setBrightness(st->getBrightness());
-                    }
+
                     if (rtc->getChange() || st->getChange())
                     {
                         matrix->fillScreen(0);
@@ -329,6 +335,7 @@ void Panel::run()
                     }
                     xSemaphoreGive(rtcMutex);
                 }
+                st->setState(NONE);
                 st->resetChange();
                 xSemaphoreGive(mutex);
             }

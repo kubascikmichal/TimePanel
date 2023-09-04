@@ -10,6 +10,7 @@ typedef enum state {
     RESET,
     NEW_DATA,
     NEW_BRIGHTNESS,
+    BUZZER_ON,
     NONE
 } STATE;
 using namespace std;

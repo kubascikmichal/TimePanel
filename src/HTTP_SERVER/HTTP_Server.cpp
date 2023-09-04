@@ -11,7 +11,7 @@ SemaphoreHandle_t HTTP_Server::_rtcMut;
 HTTP_Server::HTTP_Server()
 {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.max_uri_handlers = 13;
+    config.max_uri_handlers = 14;
 
     httpd_handle_t server = NULL;
 
@@ -31,6 +31,7 @@ HTTP_Server::HTTP_Server()
         httpd_register_uri_handler(server, &syncRTC);
         httpd_register_uri_handler(server, &programMode);
         httpd_register_uri_handler(server, &clocksMode);
+        httpd_register_uri_handler(server, &buzzerOn);
     }
 }
 
@@ -70,7 +71,7 @@ esp_err_t HTTP_Server::get_script(httpd_req_t *req)
 }
 /**
  * @brief struct for getScript handler
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::getScript = {
     .uri = "/script.js",
@@ -81,9 +82,9 @@ const httpd_uri_t HTTP_Server::getScript = {
 
 /**
  * @brief  handler for style.css
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::get_style(httpd_req_t *req)
 {
@@ -97,7 +98,7 @@ esp_err_t HTTP_Server::get_style(httpd_req_t *req)
 
 /**
  * @brief struct for getStyle handler
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::getStyle = {
     .uri = "/style.css",
@@ -108,9 +109,9 @@ const httpd_uri_t HTTP_Server::getStyle = {
 
 /**
  * @brief handler for return index.html
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::get_root(httpd_req_t *req)
 {
@@ -123,7 +124,7 @@ esp_err_t HTTP_Server::get_root(httpd_req_t *req)
 
 /**
  * @brief struct for getRoot handler
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::getRoot = {
     .uri = "/",
@@ -134,9 +135,9 @@ const httpd_uri_t HTTP_Server::getRoot = {
 
 /**
  * @brief handler for return favicon.ico
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::get_favicon_ico(httpd_req_t *req)
 {
@@ -150,7 +151,7 @@ esp_err_t HTTP_Server::get_favicon_ico(httpd_req_t *req)
 
 /**
  * @brief struct for handler getFaviconIco
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::getFaviconIco = {
     .uri = "/favicon.ico",
@@ -161,9 +162,9 @@ const httpd_uri_t HTTP_Server::getFaviconIco = {
 
 /**
  * @brief handler for setting values as university, time
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::set_values(httpd_req_t *req)
 {
@@ -196,7 +197,7 @@ esp_err_t HTTP_Server::set_values(httpd_req_t *req)
 
 /**
  * @brief struct for handler setValues
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::setValues = {
     .uri = "/setValues",
@@ -207,9 +208,9 @@ const httpd_uri_t HTTP_Server::setValues = {
 
 /**
  * @brief handler for set brightness
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::set_brightness(httpd_req_t *req)
 {
@@ -241,7 +242,7 @@ esp_err_t HTTP_Server::set_brightness(httpd_req_t *req)
 
 /**
  * @brief handler for setBrightness
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::setBrightness = {
     .uri = "/setBrightness",
@@ -252,9 +253,9 @@ const httpd_uri_t HTTP_Server::setBrightness = {
 
 /**
  * @brief handler for get online/offline status
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::get_status(httpd_req_t *req)
 {
@@ -266,7 +267,7 @@ esp_err_t HTTP_Server::get_status(httpd_req_t *req)
 
 /**
  * @brief struct for handler getStatus
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::getStatus = {
     .uri = "/getStatus",
@@ -277,9 +278,9 @@ const httpd_uri_t HTTP_Server::getStatus = {
 
 /**
  * @brief handler for starting clocks
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::start_clock(httpd_req_t *req)
 {
@@ -296,7 +297,7 @@ esp_err_t HTTP_Server::start_clock(httpd_req_t *req)
 
 /**
  * @brief struct for handler startClock
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::startClock = {
     .uri = "/startClocks",
@@ -307,9 +308,9 @@ const httpd_uri_t HTTP_Server::startClock = {
 
 /**
  * @brief handler for stopping clocks
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::stop_clock(httpd_req_t *req)
 {
@@ -326,7 +327,7 @@ esp_err_t HTTP_Server::stop_clock(httpd_req_t *req)
 
 /**
  * @brief struct for handler stopClock
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::stopClock = {
     .uri = "/stopClocks",
@@ -337,9 +338,9 @@ const httpd_uri_t HTTP_Server::stopClock = {
 
 /**
  * @brief handler for reseting clocks
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::reset_clock(httpd_req_t *req)
 {
@@ -356,7 +357,7 @@ esp_err_t HTTP_Server::reset_clock(httpd_req_t *req)
 
 /**
  * @brief struct for handler resetClock
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::resetClock = {
     .uri = "/resetClocks",
@@ -367,9 +368,9 @@ const httpd_uri_t HTTP_Server::resetClock = {
 
 /**
  * @brief handler for synchronization of RTC
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::sync_RTC(httpd_req_t *req)
 {
@@ -404,7 +405,7 @@ esp_err_t HTTP_Server::sync_RTC(httpd_req_t *req)
 
 /**
  * @brief struct for handler syncRTC
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::syncRTC = {
     .uri = "/syncRTC",
@@ -421,9 +422,9 @@ void HTTP_Server::setRTC(RTC *rtc, SemaphoreHandle_t mut)
 
 /**
  * @brief handler for changing mode to program mode
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::program_mode(httpd_req_t *req)
 {
@@ -440,7 +441,7 @@ esp_err_t HTTP_Server::program_mode(httpd_req_t *req)
 
 /**
  * @brief struct for handler programMode
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::programMode = {
     .uri = "/programMode",
@@ -451,9 +452,9 @@ const httpd_uri_t HTTP_Server::programMode = {
 
 /**
  * @brief handler for changing mode to clock mode
- * 
- * @param req 
- * @return esp_err_t 
+ *
+ * @param req
+ * @return esp_err_t
  */
 esp_err_t HTTP_Server::clocks_mode(httpd_req_t *req)
 {
@@ -470,11 +471,30 @@ esp_err_t HTTP_Server::clocks_mode(httpd_req_t *req)
 
 /**
  * @brief struct for clocksMode
- * 
+ *
  */
 const httpd_uri_t HTTP_Server::clocksMode = {
     .uri = "/clocksMode",
     .method = HTTP_POST,
     .handler = HTTP_Server::clocks_mode,
+    .user_ctx = NULL,
+};
+
+esp_err_t HTTP_Server::buzzer_on(httpd_req_t *req)
+{
+    if (xSemaphoreTake(sharedMut, 100) == pdPASS)
+    {
+        st->setState(BUZZER_ON);
+        xSemaphoreGive(sharedMut);
+    }
+    cJSON *retjson = cJSON_CreateObject();
+    cJSON_AddStringToObject(retjson, "status", "200");
+    httpd_resp_send(req, cJSON_PrintUnformatted(retjson), strlen(cJSON_PrintUnformatted(retjson)));
+    return ESP_OK;
+}
+const httpd_uri_t HTTP_Server::buzzerOn = {
+    .uri = "/buzzerOn",
+    .method = HTTP_POST,
+    .handler = HTTP_Server::buzzer_on,
     .user_ctx = NULL,
 };

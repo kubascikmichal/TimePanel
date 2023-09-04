@@ -142,3 +142,15 @@ function clocksMode() {
         }
     }
 }
+
+function buzzer(){
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "buzzerOn", true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            console.log("changeMode")
+        }
+    }
+}

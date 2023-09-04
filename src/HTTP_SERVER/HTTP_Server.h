@@ -64,6 +64,9 @@ public:
 
     static esp_err_t clocks_mode(httpd_req_t *req);
     static const httpd_uri_t clocksMode;
+
+    static esp_err_t buzzer_on(httpd_req_t *req);
+    static const httpd_uri_t buzzerOn;
 };
 
 #endif

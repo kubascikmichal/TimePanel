@@ -25,14 +25,25 @@ void playerTask(void *param)
 void RTCTask(void *param)
 {
     RTC *rtc = static_cast<RTC *>(param);
+    uint32_t lastRTCChange = (uint32_t)esp_timer_get_time() / 1000;
+    int increments = 0;
     while (true)
     {
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        if (xSemaphoreTake(rtcMut, 100) == pdPASS)
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+        if ((((uint32_t)esp_timer_get_time() / 1000) - lastRTCChange) >= 1000)
         {
-            rtc->incrementTime();
-            // printf("%d - %d:%d\n\r", rtc->getActualTime().day, rtc->getActualTime().hour, rtc->getActualTime().minutes);
-            xSemaphoreGive(rtcMut);
+            lastRTCChange = (uint32_t)esp_timer_get_time() / 1000;
+            increments++;
+            if (xSemaphoreTake(rtcMut, 10) == pdPASS)
+            {
+                for (int i = 0; i < increments; i++)
+                {
+                    rtc->incrementTime();
+                }
+                printf("%d - %d:%d:%d\n\r", rtc->getActualTime().day, rtc->getActualTime().hour, rtc->getActualTime().minutes, rtc->getActualTime().seconds);
+                increments = 0;
+                xSemaphoreGive(rtcMut);
+            }
         }
     }
 }
@@ -48,7 +59,7 @@ void setup()
     Player *pl = new Player();
     RTC *rtc = new RTC();
     rtcMut = xSemaphoreCreateMutex();
-    pl->playCustom();
+    // pl->playCustom();
     Serial.begin(115200);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     WiFi.softAP(ssid, password);
