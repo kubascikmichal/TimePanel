@@ -258,7 +258,8 @@ void Panel::run()
                     matrix->setTextColor(matrix->Color(255, 0, 0));
                 }
                 char time_str[5];
-                sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10, actualTime.seconds / 10, actualTime.seconds % 10);
+                sprintf(time_str, "%d%d:%d%d", actualTime.minutes / 10, actualTime.minutes % 10,
+                        actualTime.seconds / 10, actualTime.seconds % 10);
                 matrix->setCursor(timerOffset(time_str, 2), 30);
                 matrix->print(F(time_str));
                 if (isChange)
@@ -274,7 +275,7 @@ void Panel::run()
                     matrix->setFont(&font);
                     matrix->setTextColor(matrix->Color(0, 0, 255));
                     this->lastProgramChange = ((uint32_t)esp_timer_get_time() / 1000);
-                    program->getUpcommingEvents(rtc->getActualTime(), this->lastProgram);
+                    program->getUpcommingEvents(this->actualRTC, this->lastProgram);
                 }
                 if (st->getState() == NEW_BRIGHTNESS)
                 {
@@ -282,12 +283,12 @@ void Panel::run()
                 }
                 if (xSemaphoreTake(rtcMutex, 100) == pdPASS)
                 {
-
                     if (rtc->getChange() || st->getChange())
                     {
+                        this->actualRTC = rtc->getActualTime();
                         matrix->fillScreen(0);
                         string prg[3];
-                        program->getUpcommingEvents(rtc->getActualTime(), prg);
+                        program->getUpcommingEvents(this->actualRTC, prg);
                         if ((prg[0].length() != this->lastProgram[0].length()) ||
                             (memcmp(prg[0].c_str(), this->lastProgram[0].c_str(), min(prg[0].length(), this->lastProgram[0].length()))))
                         {
@@ -298,32 +299,31 @@ void Panel::run()
                             {
                                 this->iteration = 0;
                             }
-                            program->getUpcommingEvents(rtc->getActualTime(), this->lastProgram);
+                            program->getUpcommingEvents(this->actualRTC, this->lastProgram);
                         }
                         rtc->removeChange();
                     }
+                    xSemaphoreGive(rtcMutex);
                     if ((((uint32_t)esp_timer_get_time() / 1000) - lastProgramChange) > DELAY_PROGRAM)
                     {
                         this->iteration++;
                         lastProgramChange = ((uint32_t)esp_timer_get_time() / 1000);
                         char time_str[20];
-                        switch (rtc->getActualTime().day)
+                        switch (this->actualRTC.day)
                         {
                         case 5:
-                            sprintf(time_str, "%s %d%d:%d%d", "UTO", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
+                            sprintf(time_str, "%s %d%d:%d%d", "UTO", this->actualRTC.hour / 10, this->actualRTC.hour % 10, this->actualRTC.minutes / 10, this->actualRTC.minutes % 10);
                             break;
                         case 6:
-                            sprintf(time_str, "%s %d%d:%d%d", "STR", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
+                            sprintf(time_str, "%s %d%d:%d%d", "STR", this->actualRTC.hour / 10, this->actualRTC.hour % 10, this->actualRTC.minutes / 10, this->actualRTC.minutes % 10);
                             break;
                         case 7:
-                            sprintf(time_str, "%s %d%d:%d%d", "STV", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
+                            sprintf(time_str, "%s %d%d:%d%d", "STV", this->actualRTC.hour / 10, this->actualRTC.hour % 10, this->actualRTC.minutes / 10, this->actualRTC.minutes % 10);
                             break;
                         default:
-                            sprintf(time_str, "%s %d%d:%d%d", "---", rtc->getActualTime().hour / 10, rtc->getActualTime().hour % 10, rtc->getActualTime().minutes / 10, rtc->getActualTime().minutes % 10);
+                            sprintf(time_str, "%s %d%d:%d%d", "---", this->actualRTC.hour / 10, this->actualRTC.hour % 10, this->actualRTC.minutes / 10, this->actualRTC.minutes % 10);
                             break;
                         }
-                        // printf("%s\n\r", time_str);
-
                         matrix->setTextColor(matrix->Color(0, 0, 255));
                         matrix->setCursor(timerOffset(time_str, 9, 1), 8);
                         matrix->fillScreen(0);
@@ -333,7 +333,6 @@ void Panel::run()
                         placeProgram(this->lastProgram[2], 3, this->iteration);
                         matrix->show();
                     }
-                    xSemaphoreGive(rtcMutex);
                 }
                 st->setState(NONE);
                 st->resetChange();

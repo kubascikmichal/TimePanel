@@ -39,6 +39,7 @@ class Panel
 private:
     Adafruit_NeoMatrix *matrix;
     TIME actualTime;
+    RTC_TIME actualRTC;
     string university;
     int size;
     int time;
